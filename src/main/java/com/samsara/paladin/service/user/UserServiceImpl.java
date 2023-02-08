@@ -53,10 +53,10 @@ public class UserServiceImpl implements UserService {
 
     public UserDto registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            throw new UsernameExistsException("Account with username: '" + userDto.getUsername() + "' already exist");
+            throw new UsernameExistsException("Account with username '" + userDto.getUsername() + "' already exist");
         }
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new EmailExistsException("Account with email: '" + userDto.getEmail() + "' already exist!");
+            throw new EmailExistsException("Account with email '" + userDto.getEmail() + "' already exist!");
         }
         userDto.setCreationDate(new Date());
         userDto.setEnabled(true);
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
                 .map(this::saveUser)
                 .orElseThrow(
-                        () -> new ResetPasswordFailedException("Password reset failed!")
+                        () -> new ResetPasswordFailedException("Password reset failed! Wrong data!")
                 );
         return true;
     }

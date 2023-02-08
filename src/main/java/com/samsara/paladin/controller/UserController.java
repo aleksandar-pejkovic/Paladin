@@ -1,24 +1,18 @@
 package com.samsara.paladin.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.samsara.paladin.dto.ResetPasswordDetails;
@@ -65,42 +59,42 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public List<UserDto> readAllUsers() {
+    public List<UserDto> fetchAllUsers() {
         return userService.loadAllUsers();
     }
 
     @GetMapping("/username/{username}")
-    public UserDto readUsersByUsername(@PathVariable @NotBlank String username) {
+    public UserDto fetchUsersByUsername(@PathVariable @NotBlank String username) {
         return userService.loadUserByUsername(username);
     }
 
     @GetMapping("/email/{email}")
-    public UserDto readUsersByEmail(@PathVariable @NotBlank String email) {
+    public UserDto fetchUsersByEmail(@PathVariable @NotBlank String email) {
         return userService.loadUserByEmail(email);
     }
 
     @GetMapping("/firstName/{firstName}")
-    public List<UserDto> readUsersByFirstName(@PathVariable @NotBlank String firstName) {
+    public List<UserDto> fetchUsersByFirstName(@PathVariable @NotBlank String firstName) {
         return userService.loadUsersByFirstName(firstName);
     }
 
     @GetMapping("/lastName/{lastName}")
-    public List<UserDto> readUsersByLastName(@PathVariable @NotBlank String lastName) {
+    public List<UserDto> fetchUsersByLastName(@PathVariable @NotBlank String lastName) {
         return userService.loadUsersByFirstName(lastName);
     }
 
     @GetMapping("/firstTenAdded")
-    public List<UserDto> readFirst10AddedUsers() {
+    public List<UserDto> fetchFirst10AddedUsers() {
         return userService.loadFirst10AddedUsers();
     }
 
     @GetMapping("/lastTenAdded")
-    public List<UserDto> readLast10AddedUsers() {
+    public List<UserDto> fetchLast10AddedUsers() {
         return userService.loadLast10AddedUsers();
     }
 
     @GetMapping("/enabled")
-    public List<UserDto> readEnabledUsers() {
+    public List<UserDto> fetchEnabledUsers() {
         return userService.loadEnabledUsers();
     }
 
@@ -113,18 +107,5 @@ public class UserController {
     public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDetails passwordDetails) {
         userService.resetUserPassword(passwordDetails);
         return new ResponseEntity<>("Password changed!", HttpStatus.OK);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
     }
 }
