@@ -1,15 +1,20 @@
 package com.samsara.paladin.service.hero;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.samsara.paladin.dto.HeroDto;
+import com.samsara.paladin.enums.EventAction;
+import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.HeroType;
+import com.samsara.paladin.events.CustomEventPublisher;
 import com.samsara.paladin.exceptions.hero.HeroExistsException;
 import com.samsara.paladin.exceptions.hero.HeroNotFoundException;
 import com.samsara.paladin.exceptions.hero.HeroTypeNotFoundException;
@@ -26,12 +31,19 @@ public class HeroServiceImpl implements HeroService {
 
     private final ModelMapper modelMapper;
 
+    private CustomEventPublisher eventPublisher;
+
     private UserRepository userRepository;
 
     @Autowired
     public HeroServiceImpl(HeroRepository heroRepository, ModelMapper modelMapper) {
         this.heroRepository = heroRepository;
         this.modelMapper = modelMapper;
+    }
+
+    @Autowired
+    public void setEventPublisher(CustomEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     @Autowired
@@ -48,8 +60,11 @@ public class HeroServiceImpl implements HeroService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException(String.format("Username '%s' not found!", heroDto.getUsername()));
         }
+        heroDto.setCreationDate(new Date());
         Hero hero = convertHeroToEntity(heroDto, optionalUser.get());
-        return convertHeroToDto(heroRepository.save(hero));
+        Hero createdHero = heroRepository.save(hero);
+        publishHeroEvent(createdHero.getName(), EventAction.ADD);
+        return convertHeroToDto(createdHero);
     }
 
     @Override
@@ -60,7 +75,9 @@ public class HeroServiceImpl implements HeroService {
         }
         Hero hero = optionalHero.get();
         modelMapper.map(heroDto, hero);
-        return convertHeroToDto(heroRepository.save(hero));
+        Hero updatedHero = heroRepository.save(hero);
+        publishHeroEvent(updatedHero.getName(), EventAction.EDIT);
+        return convertHeroToDto(updatedHero);
     }
 
     @Override
@@ -70,6 +87,7 @@ public class HeroServiceImpl implements HeroService {
             throw new HeroNotFoundException("Hero '" + name + "' not found!");
         }
         heroRepository.deleteById(optionalHero.get().getId());
+        publishHeroEvent(optionalHero.get().getName(), EventAction.DELETE);
     }
 
     @Override
@@ -130,6 +148,16 @@ public class HeroServiceImpl implements HeroService {
         return convertHeroesToDtoList(heroRepository.findByOrderByCreationDateDesc());
     }
 
+    private void publishHeroEvent(String name, EventAction action) {
+        String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        eventPublisher.publishEvent(
+                EventCategory.HERO,
+                name,
+                action,
+                loggedInUsername
+        );
+    }
+
     private List<HeroDto> convertHeroesToDtoList(List<Hero> heroes) {
         return heroes
                 .stream()
@@ -146,6 +174,11 @@ public class HeroServiceImpl implements HeroService {
     private Hero convertHeroToEntity(HeroDto heroDto, User user) {
         Hero hero = modelMapper.map(heroDto, Hero.class);
         hero.setUser(user);
+        Optional<HeroType> optionalHeroType = HeroType.valueOfType(heroDto.getType());
+        if (optionalHeroType.isEmpty()) {
+            throw new HeroTypeNotFoundException("Invalid hero type!");
+        }
+        hero.setType(optionalHeroType.get());
         return hero;
     }
 }

@@ -80,7 +80,7 @@ public class UserController {
 
     @GetMapping("/lastName/{lastName}")
     public List<UserDto> fetchUsersByLastName(@PathVariable @NotBlank String lastName) {
-        return userService.loadUsersByFirstName(lastName);
+        return userService.loadUsersByLastName(lastName);
     }
 
     @GetMapping("/firstTenAdded")

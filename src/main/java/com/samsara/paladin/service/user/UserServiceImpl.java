@@ -8,13 +8,16 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
+import com.samsara.paladin.enums.EventAction;
+import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.RoleName;
-import com.samsara.paladin.events.EventPublisher;
+import com.samsara.paladin.events.CustomEventPublisher;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
 import com.samsara.paladin.exceptions.user.ResetPasswordFailedException;
@@ -32,17 +35,16 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
 
-    private final EventPublisher eventPublisher;
+    private CustomEventPublisher eventPublisher;
 
     private RoleRepository roleRepository;
 
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, EventPublisher eventPublisher) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.eventPublisher = eventPublisher;
     }
 
     @Autowired
@@ -53,6 +55,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Autowired
+    public void setEventPublisher(CustomEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     public UserDto registerUser(UserDto userDto) {
@@ -68,6 +75,7 @@ public class UserServiceImpl implements UserService {
         encryptUserPassword(user);
         assignDefaultRoleToUser(user);
         User registeredUser = saveUser(user);
+        publishUserEvent(registeredUser.getUsername(), EventAction.REGISTER);
         return convertUserToDto(registeredUser);
     }
 
@@ -83,6 +91,7 @@ public class UserServiceImpl implements UserService {
             encryptUserPassword(storedUser);
         }
         User updatedUser = saveUser(storedUser);
+        publishUserEvent(updatedUser.getUsername(), EventAction.EDIT);
         return convertUserToDto(updatedUser);
     }
 
@@ -95,6 +104,7 @@ public class UserServiceImpl implements UserService {
         User storedUser = optionalUser.get();
         storedUser.getRoles().add(roleRepository.findByName(RoleName.ADMIN));
         User adminUser = saveUser(storedUser);
+        publishUserEvent(adminUser.getUsername(), EventAction.GRANT_ADMIN);
         return convertUserToDto(adminUser);
     }
 
@@ -105,6 +115,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Username '" + username + "' not found!");
         }
         userRepository.delete(optionalUser.get());
+        publishUserEvent(optionalUser.get().getUsername(), EventAction.DELETE);
     }
 
     @Override
@@ -171,6 +182,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(
                         () -> new ResetPasswordFailedException("Password reset failed! Wrong data!")
                 );
+        publishUserEvent(resetPasswordDetails.getUsername(), EventAction.CHANGE_PASSWORD);
         return true;
     }
 
@@ -192,6 +204,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    private void publishUserEvent(String username, EventAction action) {
+        String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        eventPublisher.publishEvent(
+                EventCategory.USER,
+                username,
+                action,
+                loggedInUsername
+        );
+    }
+
     private List<UserDto> convertUsersToDtoList(List<User> users) {
         return users
                 .stream()
@@ -200,7 +222,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserDto convertUserToDto(User user) {
-        return modelMapper.map(user, UserDto.class);
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        userDto.setHeroCount(user.getHeroes().size());
+        return userDto;
     }
 
     private User convertUserToEntity(UserDto userDto) {

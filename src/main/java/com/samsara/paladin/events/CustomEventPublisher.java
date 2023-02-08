@@ -8,14 +8,15 @@ import org.springframework.stereotype.Component;
 
 import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
+import com.samsara.paladin.model.Event;
 
 @Component
-public class EventPublisher {
+public class CustomEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    public EventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    public CustomEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
@@ -27,14 +28,13 @@ public class EventPublisher {
     ) {
         System.out.println("Publishing custom event. ");
 
-        EventDetails event = new EventDetails(
-                this,
-                category,
-                object,
-                action,
-                username,
-                new Date()
-        );
+        Event event = Event.builder()
+                .category(category)
+                .object(object)
+                .action(action)
+                .username(username)
+                .date(new Date())
+                .build();
 
         applicationEventPublisher.publishEvent(event);
     }

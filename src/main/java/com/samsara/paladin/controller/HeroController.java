@@ -19,12 +19,18 @@ import com.samsara.paladin.dto.HeroDto;
 import com.samsara.paladin.service.hero.HeroServiceImpl;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/api/heroes")
 @Validated
 public class HeroController {
+
+    private static final int MIN_LEVEL = 0;
+
+    private static final int MAX_LEVEL = 80;
 
     private final HeroServiceImpl heroService;
 
@@ -67,17 +73,17 @@ public class HeroController {
     }
 
     @GetMapping("/level/{level}")
-    public List<HeroDto> fetchHeroesByLevel(@PathVariable @NotBlank Integer level) {
+    public List<HeroDto> fetchHeroesByLevel(@PathVariable @Min(MIN_LEVEL) @Max(MAX_LEVEL) Integer level) {
         return heroService.loadHeroesByLevel(level);
     }
 
     @GetMapping("/min-level/{level}")
-    public List<HeroDto> fetchHeroesByMinLevel(@PathVariable @NotBlank Integer level) {
+    public List<HeroDto> fetchHeroesByMinLevel(@PathVariable @Min(MIN_LEVEL) @Max(MAX_LEVEL) Integer level) {
         return heroService.loadHeroesByMinLevel(level);
     }
 
     @GetMapping("/max-level/{level}")
-    public List<HeroDto> fetchHeroesByMaxLevel(@PathVariable @NotBlank Integer level) {
+    public List<HeroDto> fetchHeroesByMaxLevel(@PathVariable @Min(MIN_LEVEL) @Max(MAX_LEVEL) Integer level) {
         return heroService.loadHeroesByMaxLevel(level);
     }
 

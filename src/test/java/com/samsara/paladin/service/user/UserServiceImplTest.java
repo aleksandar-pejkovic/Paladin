@@ -26,9 +26,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -36,7 +40,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.RoleName;
-import com.samsara.paladin.events.EventPublisher;
+import com.samsara.paladin.events.CustomEventPublisher;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
 import com.samsara.paladin.exceptions.user.ResetPasswordFailedException;
@@ -58,7 +62,7 @@ public class UserServiceImplTest {
     private ModelMapper modelMapper;
 
     @MockBean
-    private EventPublisher eventPublisher;
+    private CustomEventPublisher eventPublisher;
 
     @MockBean
     private UserRepository userRepository;
@@ -75,6 +79,10 @@ public class UserServiceImplTest {
     @BeforeEach
     void beforeEach() {
         doNothing().when(eventPublisher).publishEvent(any(), any(), any(), any());
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @Test
