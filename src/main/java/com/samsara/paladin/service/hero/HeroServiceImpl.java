@@ -12,6 +12,7 @@ import com.samsara.paladin.dto.HeroDto;
 import com.samsara.paladin.enums.HeroType;
 import com.samsara.paladin.exceptions.hero.HeroExistsException;
 import com.samsara.paladin.exceptions.hero.HeroNotFoundException;
+import com.samsara.paladin.exceptions.hero.HeroTypeNotFoundException;
 import com.samsara.paladin.exceptions.user.UsernameNotFoundException;
 import com.samsara.paladin.model.Hero;
 import com.samsara.paladin.model.User;
@@ -47,8 +48,8 @@ public class HeroServiceImpl implements HeroService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException(String.format("Username '%s' not found!", heroDto.getUsername()));
         }
-        Hero hero = convertToEntity(heroDto, optionalUser.get());
-        return convertToDto(heroRepository.save(hero));
+        Hero hero = convertHeroToEntity(heroDto, optionalUser.get());
+        return convertHeroToDto(heroRepository.save(hero));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class HeroServiceImpl implements HeroService {
         }
         Hero hero = optionalHero.get();
         modelMapper.map(heroDto, hero);
-        return convertToDto(heroRepository.save(hero));
+        return convertHeroToDto(heroRepository.save(hero));
     }
 
     @Override
@@ -73,13 +74,13 @@ public class HeroServiceImpl implements HeroService {
 
     @Override
     public List<HeroDto> loadAllHeroes() {
-        return convertToDtoList(heroRepository.findAll());
+        return convertHeroesToDtoList(heroRepository.findAll());
     }
 
     @Override
     public HeroDto loadHeroByName(String name) {
         return heroRepository.findByName(name)
-                .map(this::convertToDto)
+                .map(this::convertHeroToDto)
                 .orElseThrow(
                         () -> new HeroNotFoundException("Hero '" + name + "' not found!")
                 );
@@ -91,53 +92,58 @@ public class HeroServiceImpl implements HeroService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("Username '" + username + "' not found!");
         }
-        return convertToDtoList(heroRepository.findByUser(optionalUser.get()));
+        return convertHeroesToDtoList(heroRepository.findByUser(optionalUser.get()));
     }
 
     @Override
-    public List<HeroDto> loadHeroesByType(HeroType type) {
-        return convertToDtoList(heroRepository.findByType(type));
+    public List<HeroDto> loadHeroesByType(String heroTypeName) {
+        return HeroType.valueOfType(heroTypeName)
+                .map(heroRepository::findByType)
+                .map(this::convertHeroesToDtoList)
+                .orElseThrow(
+                        () -> new HeroTypeNotFoundException("Hero type '" + heroTypeName + "' not found!")
+                );
     }
 
     @Override
     public List<HeroDto> loadHeroesByLevel(Integer level) {
-        return convertToDtoList(heroRepository.findByLevel(level));
+        return convertHeroesToDtoList(heroRepository.findByLevel(level));
     }
 
     @Override
     public List<HeroDto> loadHeroesByMinLevel(Integer level) {
-        return convertToDtoList(heroRepository.findByLevelGreaterThan(level));
+        return convertHeroesToDtoList(heroRepository.findByLevelGreaterThan(level));
     }
 
     @Override
     public List<HeroDto> loadHeroesByMaxLevel(Integer level) {
-        return convertToDtoList(heroRepository.findByLevelLessThan(level));
+        return convertHeroesToDtoList(heroRepository.findByLevelLessThan(level));
     }
 
     @Override
     public List<HeroDto> loadBest10HeroesByLevel() {
-        return convertToDtoList(heroRepository.findFirst10ByOrderByLevelDesc());
+        return convertHeroesToDtoList(heroRepository.findFirst10ByOrderByLevelDesc());
     }
 
     @Override
     public List<HeroDto> loadLast10AddedHeroes() {
-        return convertToDtoList(heroRepository.findByOrderByCreationDateDesc());
+        return convertHeroesToDtoList(heroRepository.findByOrderByCreationDateDesc());
     }
 
-    private List<HeroDto> convertToDtoList(List<Hero> heroes) {
+    private List<HeroDto> convertHeroesToDtoList(List<Hero> heroes) {
         return heroes
                 .stream()
-                .map(this::convertToDto)
+                .map(this::convertHeroToDto)
                 .collect(Collectors.toList());
     }
 
-    private HeroDto convertToDto(Hero hero) {
+    private HeroDto convertHeroToDto(Hero hero) {
         HeroDto heroDto = modelMapper.map(hero, HeroDto.class);
         heroDto.setUsername(hero.getUser().getUsername());
         return heroDto;
     }
 
-    private Hero convertToEntity(HeroDto heroDto, User user) {
+    private Hero convertHeroToEntity(HeroDto heroDto, User user) {
         Hero hero = modelMapper.map(heroDto, Hero.class);
         hero.setUser(user);
         return hero;

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public enum HeroType {
@@ -46,7 +47,8 @@ public enum HeroType {
                 .collect(Collectors.toList());
     }
 
-    public static HeroType valueOfType(String type) {
-        return BY_TYPE.get(type);
+    public static Optional<HeroType> valueOfType(String type) {
+        HeroType heroType = BY_TYPE.get(type);
+        return Optional.ofNullable(heroType);
     }
 }

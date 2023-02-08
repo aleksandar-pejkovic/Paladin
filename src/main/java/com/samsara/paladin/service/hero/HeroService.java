@@ -3,7 +3,6 @@ package com.samsara.paladin.service.hero;
 import java.util.List;
 
 import com.samsara.paladin.dto.HeroDto;
-import com.samsara.paladin.enums.HeroType;
 
 public interface HeroService {
 
@@ -19,7 +18,7 @@ public interface HeroService {
 
     List<HeroDto> loadHeroesByUser(String username);
 
-    List<HeroDto> loadHeroesByType(HeroType type);
+    List<HeroDto> loadHeroesByType(String type);
 
     List<HeroDto> loadHeroesByLevel(Integer level);
 
