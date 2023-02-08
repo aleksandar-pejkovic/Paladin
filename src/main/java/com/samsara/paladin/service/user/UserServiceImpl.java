@@ -29,15 +29,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final ModelMapper modelMapper;
+
     private RoleRepository roleRepository;
 
     private PasswordEncoder passwordEncoder;
 
-    private ModelMapper modelMapper;
-
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Autowired
@@ -50,11 +51,6 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Autowired
-    public void setModelMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
-
     public UserDto registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
             throw new UsernameExistsException("Account with username: '" + userDto.getUsername() + "' already exist");
@@ -64,11 +60,11 @@ public class UserServiceImpl implements UserService {
         }
         userDto.setCreationDate(new Date());
         userDto.setEnabled(true);
-        User user = convertToEntity(userDto);
+        User user = convertUserToEntity(userDto);
         encryptUserPassword(user);
         assignDefaultRoleToUser(user);
         User registeredUser = saveUser(user);
-        return convertToDto(registeredUser);
+        return convertUserToDto(registeredUser);
     }
 
     @Override
@@ -83,7 +79,7 @@ public class UserServiceImpl implements UserService {
             encryptUserPassword(storedUser);
         }
         User updatedUser = saveUser(storedUser);
-        return convertToDto(updatedUser);
+        return convertUserToDto(updatedUser);
     }
 
     @Override
@@ -95,7 +91,7 @@ public class UserServiceImpl implements UserService {
         User storedUser = optionalUser.get();
         storedUser.getRoles().add(roleRepository.findByName(RoleName.ADMIN));
         User adminUser = saveUser(storedUser);
-        return convertToDto(adminUser);
+        return convertUserToDto(adminUser);
     }
 
     @Override
@@ -109,13 +105,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> loadAllUsers() {
-        return convertToDtoList(userRepository.findAll());
+        return convertUsersToDtoList(userRepository.findAll());
     }
 
     @Override
     public UserDto loadUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(this::convertToDto)
+                .map(this::convertUserToDto)
                 .orElseThrow(
                         () -> new UsernameNotFoundException(String.format("Username '%s' not found!", username))
                 );
@@ -124,7 +120,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto loadUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .map(this::convertToDto)
+                .map(this::convertUserToDto)
                 .orElseThrow(
                         () -> new EmailNotFoundException(String.format("Email '%s' not found!", email))
                 );
@@ -132,33 +128,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> loadUsersByFirstName(String firstName) {
-        return convertToDtoList(userRepository.findByFirstName(firstName));
+        return convertUsersToDtoList(userRepository.findByFirstName(firstName));
     }
 
     @Override
     public List<UserDto> loadUsersByLastName(String lastName) {
-        return convertToDtoList(userRepository.findByLastName(lastName));
+        return convertUsersToDtoList(userRepository.findByLastName(lastName));
     }
 
     @Override
     public List<UserDto> loadFirst10AddedUsers() {
-        return convertToDtoList(userRepository.findFirst10ByOrderByCreationDateAsc());
+        return convertUsersToDtoList(userRepository.findFirst10ByOrderByCreationDateAsc());
     }
 
     @Override
     public List<UserDto> loadLast10AddedUsers() {
-        return convertToDtoList(userRepository.findFirst10ByOrderByCreationDateDesc());
+        return convertUsersToDtoList(userRepository.findFirst10ByOrderByCreationDateDesc());
     }
 
     @Override
     public List<UserDto> loadEnabledUsers() {
-        return convertToDtoList(userRepository.findByEnabled(true));
+        return convertUsersToDtoList(userRepository.findByEnabled(true));
     }
 
     @Override
     public List<UserDto> loadAdmins() {
-        Role role = roleRepository.findByName(RoleName.ADMIN);
-        return convertToDtoList(userRepository.findByRoles(role));
+        Role adminRole = roleRepository.findByName(RoleName.ADMIN);
+        return convertUsersToDtoList(userRepository.findByRoles(adminRole));
     }
 
     @Override
@@ -184,25 +180,26 @@ public class UserServiceImpl implements UserService {
     }
 
     private void assignDefaultRoleToUser(User user) {
-        user.setRoles(Collections.singleton(roleRepository.findByName(RoleName.USER)));
+        Role userRole = roleRepository.findByName(RoleName.USER);
+        user.setRoles(Collections.singleton(userRole));
     }
 
     private User saveUser(User user) {
         return userRepository.save(user);
     }
 
-    private List<UserDto> convertToDtoList(List<User> users) {
+    private List<UserDto> convertUsersToDtoList(List<User> users) {
         return users
                 .stream()
-                .map(this::convertToDto)
+                .map(this::convertUserToDto)
                 .collect(Collectors.toList());
     }
 
-    private UserDto convertToDto(User user) {
+    private UserDto convertUserToDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }
 
-    private User convertToEntity(UserDto userDto) {
+    private User convertUserToEntity(UserDto userDto) {
         return modelMapper.map(userDto, User.class);
     }
 }

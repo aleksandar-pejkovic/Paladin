@@ -23,6 +23,18 @@ public class UserDto {
 
     private static final int NAME_MAX_SIZE = 20;
 
+    private static final int USERNAME_MIN_SIZE = 3;
+
+    private static final int USERNAME_MAX_SIZE = 35;
+
+    private static final int PASSWORD_MIN_SIZE = 6;
+
+    private static final int PASSWORD_MAX_SIZE = 12;
+
+    private static final int DEFAULT_MIN_SIZE = 1;
+
+    private static final int DEFAULT_MAX_SIZE = 60;
+
     private static final int ABOUT_MAX_SIZE = 300;
 
     private static final String NAME_PATTERN = "^[A-ZČĆŠĐŽ][a-zA-ZčćšđžČĆŠĐŽ]*[ \\u0027-]?"
@@ -33,6 +45,20 @@ public class UserDto {
 
     private static final String LAST_NAME_MESSAGE = "Last name can contain letters only "
             + "and must not contain whitespace!";
+
+    private static final String USERNAME_PATTERN = "^[a-z][a-z0-9]*$";
+
+    private static final String PASSWORD_PATTERN = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,}";
+
+    private static final String DEFAULT_PATTERN = "^[a-zA-Z0-9ČĆŠĐŽčćšđž,.!? \\u0027-]+$";
+
+    private static final String USERNAME_MESSAGE = "Username must contain only lower case letters and numbers, "
+            + "must start with a letter, and must be 3-35 characters long!";
+
+    private static final String PASSWORD_MESSAGE = "Password must contain at least one number, "
+            + "one lowercase and one uppercase letter, and must be 6-12 characters long!";
+
+    private static final String DEFAULT_MESSAGE = "Incorrect format!";
 
     private Long id;
 
@@ -49,25 +75,25 @@ public class UserDto {
     private String lastName;
 
     @NotEmpty
-    @Size(min = ValidationConstants.USERNAME_MIN_SIZE, max = ValidationConstants.USERNAME_MAX_SIZE)
-    @Pattern(regexp = ValidationConstants.USERNAME_PATTERN,
-            message = ValidationConstants.USERNAME_MESSAGE)
+    @Size(min = USERNAME_MIN_SIZE, max = USERNAME_MAX_SIZE)
+    @Pattern(regexp = USERNAME_PATTERN,
+            message = USERNAME_MESSAGE)
     private String username;
 
     @NotEmpty
-    @Size(max = ValidationConstants.DEFAULT_MAX_SIZE)
+    @Size(max = DEFAULT_MAX_SIZE)
     @Email
     private String email;
 
-    @Size(min = ValidationConstants.PASSWORD_MIN_SIZE, max = ValidationConstants.PASSWORD_MAX_SIZE)
-    @Pattern(regexp = ValidationConstants.PASSWORD_PATTERN,
-            message = ValidationConstants.PASSWORD_MESSAGE)
+    @Size(min = PASSWORD_MIN_SIZE, max = PASSWORD_MAX_SIZE)
+    @Pattern(regexp = PASSWORD_PATTERN,
+            message = PASSWORD_MESSAGE)
     private String password;
 
     @NotEmpty
-    @Size(min = ValidationConstants.DEFAULT_MIN_SIZE, max = ABOUT_MAX_SIZE)
-    @Pattern(regexp = ValidationConstants.DEFAULT_PATTERN,
-            message = ValidationConstants.DEFAULT_MESSAGE)
+    @Size(min = DEFAULT_MIN_SIZE, max = ABOUT_MAX_SIZE)
+    @Pattern(regexp = DEFAULT_PATTERN,
+            message = DEFAULT_MESSAGE)
     private String about;
 
     private Integer heroCount;
@@ -77,14 +103,14 @@ public class UserDto {
     private Boolean enabled;
 
     @NotEmpty
-    @Size(min = ValidationConstants.DEFAULT_MIN_SIZE, max = ValidationConstants.DEFAULT_MAX_SIZE)
-    @Pattern(regexp = ValidationConstants.DEFAULT_PATTERN,
-            message = ValidationConstants.DEFAULT_MESSAGE)
+    @Size(min = DEFAULT_MIN_SIZE, max = DEFAULT_MAX_SIZE)
+    @Pattern(regexp = DEFAULT_PATTERN,
+            message = DEFAULT_MESSAGE)
     private String secretQuestion;
 
     @NotEmpty
-    @Size(min = ValidationConstants.DEFAULT_MIN_SIZE, max = ValidationConstants.DEFAULT_MAX_SIZE)
-    @Pattern(regexp = ValidationConstants.DEFAULT_PATTERN,
-            message = ValidationConstants.DEFAULT_MESSAGE)
+    @Size(min = DEFAULT_MIN_SIZE, max = DEFAULT_MAX_SIZE)
+    @Pattern(regexp = DEFAULT_PATTERN,
+            message = DEFAULT_MESSAGE)
     private String secretAnswer;
 }

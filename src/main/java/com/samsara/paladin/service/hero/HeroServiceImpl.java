@@ -23,23 +23,19 @@ public class HeroServiceImpl implements HeroService {
 
     private final HeroRepository heroRepository;
 
+    private final ModelMapper modelMapper;
+
     private UserRepository userRepository;
 
-    private ModelMapper modelMapper;
-
     @Autowired
-    public HeroServiceImpl(HeroRepository heroRepository) {
+    public HeroServiceImpl(HeroRepository heroRepository, ModelMapper modelMapper) {
         this.heroRepository = heroRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setModelMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
     }
 
     @Override

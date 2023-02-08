@@ -29,6 +29,8 @@ public class HeroDto {
     private static final String NAME_MESSAGE = "Hero name may have more than one word "
             + "with exactly one space between them. Words must contain only letters and numbers!";
 
+    private static final int DEFAULT_MAX_SIZE = 60;
+
     private static final int MIN_LEVEL = 0;
 
     private static final int MAX_LEVEL = 80;
@@ -41,7 +43,7 @@ public class HeroDto {
             message = NAME_MESSAGE)
     private String name;
 
-    @Size(max = ValidationConstants.DEFAULT_MAX_SIZE)
+    @Size(max = DEFAULT_MAX_SIZE)
     private String type;
 
     @Min(MIN_LEVEL)
