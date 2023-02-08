@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.RoleName;
+import com.samsara.paladin.events.EventPublisher;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
 import com.samsara.paladin.exceptions.user.ResetPasswordFailedException;
@@ -55,6 +58,9 @@ public class UserServiceImplTest {
     private ModelMapper modelMapper;
 
     @MockBean
+    private EventPublisher eventPublisher;
+
+    @MockBean
     private UserRepository userRepository;
 
     @MockBean
@@ -65,6 +71,11 @@ public class UserServiceImplTest {
 
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
+
+    @BeforeEach
+    void beforeEach() {
+        doNothing().when(eventPublisher).publishEvent(any(), any(), any(), any());
+    }
 
     @Test
     @DisplayName("Register user test when user is valid then correct")
