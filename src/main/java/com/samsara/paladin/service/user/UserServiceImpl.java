@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.RoleName;
+import com.samsara.paladin.events.EventPublisher;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
 import com.samsara.paladin.exceptions.user.ResetPasswordFailedException;
@@ -31,14 +32,17 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
 
+    private final EventPublisher eventPublisher;
+
     private RoleRepository roleRepository;
 
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, EventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.eventPublisher = eventPublisher;
     }
 
     @Autowired

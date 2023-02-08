@@ -133,16 +133,16 @@ INSERT INTO roles_permissions (role_id, permission_id) VALUES
     (2, 2),
     (2, 3);
 
---CREATE TABLE events (
---    event_id VARCHAR(60),
---    category VARCHAR(60),
---    object VARCHAR(100),
---    action VARCHAR(60),
---    user VARCHAR(60),
---    date TIMESTAMP,
---    KEY (event_id)
---);
---
+CREATE TABLE events (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    category VARCHAR(60) NOT NULL,
+    object VARCHAR(100) NOT NULL,
+    action VARCHAR(60) NOT NULL,
+    user VARCHAR(60) NOT NULL,
+    date TIMESTAMP NOT NULL,
+    PRIMARY KEY (id)
+);
+
 --CREATE TABLE properties (
 --    property_id VARCHAR(36),
 --    name VARCHAR(36),
