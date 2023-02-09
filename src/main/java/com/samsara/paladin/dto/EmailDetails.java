@@ -24,7 +24,7 @@ public class EmailDetails {
 
     public void setSubject() {
         this.subject = String.format(
-                "%s performed on %s object %s",
+                "%s performed on %s object '%s'",
                 event.getAction().name(),
                 event.getCategory().name(),
                 event.getObject()
@@ -33,10 +33,10 @@ public class EmailDetails {
 
     public void setText() {
         this.text = String.format(
-                "Following action '%s' was performed "
-                        + "in category '%s' "
+                "Following action %s was performed "
+                        + "in category %s "
                         + "over an object '%s' "
-                        + "by '%s' with username '%s'.",
+                        + "by %s with username '%s'.",
                 event.getAction().name(),
                 event.getCategory().name(),
                 event.getObject(),

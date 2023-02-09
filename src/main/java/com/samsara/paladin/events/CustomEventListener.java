@@ -1,22 +1,23 @@
 package com.samsara.paladin.events;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.samsara.paladin.model.Event;
 import com.samsara.paladin.repository.EventRepository;
-import com.samsara.paladin.service.email.EmailServiceImpl;
+import com.samsara.paladin.service.email.EmailService;
 
 @Component
 public class CustomEventListener {
 
     private final EventRepository eventRepository;
 
-    private final EmailServiceImpl emailService;
+    @Autowired
+    private EmailService emailService;
 
-    public CustomEventListener(EventRepository eventRepository, EmailServiceImpl emailService) {
+    public CustomEventListener(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
-        this.emailService = emailService;
     }
 
     @EventListener

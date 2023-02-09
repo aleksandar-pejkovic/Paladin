@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.samsara.paladin.dto.EmailDetails;
@@ -28,6 +29,7 @@ public class EmailServiceImpl implements EmailService {
         this.userRepository = userRepository;
     }
 
+    @Async
     @Override
     public void sendEmailToAdmin(Event event) {
 
@@ -35,7 +37,7 @@ public class EmailServiceImpl implements EmailService {
         String[] adminEmails = adminEmailsList.toArray(new String[0]);
 
         boolean isAdmin = false;
-        Optional<User> optionalUser = userRepository.findByUsername(event.getUsername());
+        Optional<User> optionalUser = userRepository.findUserWithRolesFetched(event.getUsername());
         if (optionalUser.isPresent()) {
             isAdmin = optionalUser.get().isAdmin();
         }
