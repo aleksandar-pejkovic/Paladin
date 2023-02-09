@@ -100,6 +100,7 @@ public class UserServiceImplTest {
                 .password("testCryptPassword")
                 .enabled(true)
                 .creationDate(new Date())
+                .heroes(new HashSet<>())
                 .build();
 
         Role role = Role.builder()
@@ -205,6 +206,7 @@ public class UserServiceImplTest {
                 .username("test")
                 .email("test@email.com")
                 .password("testCryptPassword")
+                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByUsername(userDto.getUsername()))
@@ -265,6 +267,7 @@ public class UserServiceImplTest {
                 .id(1L)
                 .username("test")
                 .email("test@email.com")
+                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByUsername(userDto.getUsername()))
@@ -295,6 +298,7 @@ public class UserServiceImplTest {
 
         User user = User.builder()
                 .username("test")
+                .heroes(new HashSet<>())
                 .build();
 
         Role roleUser = Role.builder()
@@ -404,10 +408,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .username("Test1")
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .username("Test2")
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
@@ -453,6 +459,7 @@ public class UserServiceImplTest {
         User user = User.builder()
                 .id(1L)
                 .username("Test")
+                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByUsername("Test"))
@@ -493,6 +500,7 @@ public class UserServiceImplTest {
         User user = User.builder()
                 .id(1L)
                 .email("Test")
+                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByEmail("Test"))
@@ -538,10 +546,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .firstName("Test")
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .firstName("Test")
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
@@ -592,10 +602,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .lastName("Test")
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .lastName("Test")
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
@@ -647,10 +659,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .username("Test")
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .username("Test")
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
@@ -702,10 +716,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .username("Test")
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .username("Test")
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
@@ -741,10 +757,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .enabled(true)
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .enabled(true)
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
@@ -792,10 +810,12 @@ public class UserServiceImplTest {
         User user1 = User.builder()
                 .id(1L)
                 .roles(roles)
+                .heroes(new HashSet<>())
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .roles(roles)
+                .heroes(new HashSet<>())
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
