@@ -7,7 +7,8 @@ public enum PermissionName implements GrantedAuthority {
     READ,
     WRITE,
     UPDATE,
-    DELETE;
+    DELETE,
+    GRANT_ADMIN;
 
     @Override
     public String getAuthority() {

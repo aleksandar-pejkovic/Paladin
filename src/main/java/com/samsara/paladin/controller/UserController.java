@@ -46,6 +46,12 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
+    @PutMapping("/password-reset")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDetails passwordDetails) {
+        userService.resetUserPassword(passwordDetails);
+        return new ResponseEntity<>("Password changed!", HttpStatus.OK);
+    }
+
     @PutMapping("/promote/{username}")
     public ResponseEntity<UserDto> promoteUserToAdmin(@PathVariable @NotBlank String username) {
         UserDto userResponse = userService.grantAdminRoleToUser(username);
@@ -101,11 +107,5 @@ public class UserController {
     @GetMapping("/admins")
     public List<UserDto> showAdmins() {
         return userService.loadAdmins();
-    }
-
-    @PutMapping("/password")
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDetails passwordDetails) {
-        userService.resetUserPassword(passwordDetails);
-        return new ResponseEntity<>("Password changed!", HttpStatus.OK);
     }
 }

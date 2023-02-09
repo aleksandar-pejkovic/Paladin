@@ -18,9 +18,11 @@ import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.RoleName;
 import com.samsara.paladin.events.CustomEventPublisher;
+import com.samsara.paladin.exceptions.passwordValidation.IllegalPasswordArgumentException;
+import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissingException;
+import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
-import com.samsara.paladin.exceptions.user.ResetPasswordFailedException;
 import com.samsara.paladin.exceptions.user.UsernameExistsException;
 import com.samsara.paladin.exceptions.user.UsernameNotFoundException;
 import com.samsara.paladin.model.Role;
@@ -69,6 +71,9 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new EmailExistsException("Account with email '" + userDto.getEmail() + "' already exist!");
         }
+        if (userDto.getPassword() == null) {
+            throw new PasswordArgumentMissingException("Password missing for new user!");
+        }
         userDto.setCreationDate(new Date());
         userDto.setEnabled(true);
         User user = convertUserToEntity(userDto);
@@ -86,13 +91,27 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Username '" + userDto.getUsername() + "' not found!");
         }
         User storedUser = optionalUser.get();
-        modelMapper.map(userDto, storedUser);
         if (userDto.getPassword() != null) {
-            encryptUserPassword(storedUser);
+            throw new IllegalPasswordArgumentException("Please use 'password reset' option for password update!");
         }
+        modelMapper.map(userDto, storedUser);
         User updatedUser = saveUser(storedUser);
         publishUserEvent(updatedUser.getUsername(), EventAction.EDIT);
         return convertUserToDto(updatedUser);
+    }
+
+    @Override
+    public boolean resetUserPassword(ResetPasswordDetails resetPasswordDetails) {
+
+        userRepository.findByUsername(resetPasswordDetails.getUsername())
+                .filter(user -> user.getSecretAnswer().equals(resetPasswordDetails.getSecretAnswer()))
+                .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
+                .map(this::saveUser)
+                .orElseThrow(
+                        () -> new ResetPasswordFailedException("Password reset failed! Wrong data!")
+                );
+        publishUserEvent(resetPasswordDetails.getUsername(), EventAction.CHANGE_PASSWORD);
+        return true;
     }
 
     @Override
@@ -170,20 +189,6 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> loadAdmins() {
         Role adminRole = roleRepository.findByName(RoleName.ADMIN);
         return convertUsersToDtoList(userRepository.findByRoles(adminRole));
-    }
-
-    @Override
-    public boolean resetUserPassword(ResetPasswordDetails resetPasswordDetails) {
-
-        userRepository.findByUsername(resetPasswordDetails.getUsername())
-                .filter(user -> user.getSecretAnswer().equals(resetPasswordDetails.getSecretAnswer()))
-                .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
-                .map(this::saveUser)
-                .orElseThrow(
-                        () -> new ResetPasswordFailedException("Password reset failed! Wrong data!")
-                );
-        publishUserEvent(resetPasswordDetails.getUsername(), EventAction.CHANGE_PASSWORD);
-        return true;
     }
 
     private void encryptUserPassword(User user) {

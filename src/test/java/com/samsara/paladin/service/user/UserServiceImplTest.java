@@ -3,6 +3,7 @@ package com.samsara.paladin.service.user;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,9 +38,11 @@ import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.RoleName;
 import com.samsara.paladin.events.CustomEventPublisher;
+import com.samsara.paladin.exceptions.passwordValidation.IllegalPasswordArgumentException;
+import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissingException;
+import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
-import com.samsara.paladin.exceptions.user.ResetPasswordFailedException;
 import com.samsara.paladin.exceptions.user.UsernameExistsException;
 import com.samsara.paladin.exceptions.user.UsernameNotFoundException;
 import com.samsara.paladin.model.Role;
@@ -83,6 +86,7 @@ public class UserServiceImplTest {
 
         UserDto userDto = UserDto.builder()
                 .username("Test")
+                .password(anyString())
                 .email("test@mai.com")
                 .build();
 
@@ -92,7 +96,6 @@ public class UserServiceImplTest {
                 .password("testCryptPassword")
                 .enabled(true)
                 .creationDate(new Date())
-                .heroes(new HashSet<>())
                 .build();
 
         Role role = Role.builder()
@@ -105,7 +108,7 @@ public class UserServiceImplTest {
 
         user.setRoles(roles);
 
-        when(userRepository.existsByUsername(anyString()))
+        when(userRepository.existsByUsername("Test"))
                 .thenReturn(false);
         when(userRepository.existsByEmail(anyString()))
                 .thenReturn(false);
@@ -167,7 +170,7 @@ public class UserServiceImplTest {
 
         UserDto userDto = UserDto.builder()
                 .username("Test")
-                .email("test@mai.com")
+                .email("test@mail.com")
                 .build();
 
         when(userRepository.existsByUsername(anyString()))
@@ -184,27 +187,44 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Register user test when password is missing then throw")
+    void registerUserTestWhenPasswordIsMissingThenThrow() {
+
+        UserDto userDto = UserDto.builder()
+                .username("Test")
+                .email("test@mail.com")
+                .build();
+
+        when(userRepository.existsByUsername(userDto.getUsername()))
+                .thenReturn(false);
+        when(userRepository.existsByEmail(userDto.getEmail()))
+                .thenReturn(false);
+
+        assertThrows(PasswordArgumentMissingException.class, () -> {
+            userService.registerUser(userDto);
+            verify(userRepository).existsByUsername(userDto.getUsername());
+            verify(userRepository).existsByEmail(userDto.getEmail());
+            verify(userRepository, never()).save(any());
+        });
+    }
+
+    @Test
     @DisplayName("Update user test when user is valid then correct")
     void updateUserTestWhenUserIsValidThenCorrect() {
 
         UserDto userDto = UserDto.builder()
                 .id(1L)
                 .username("test")
-                .password("Test123")
                 .build();
 
         User user = User.builder()
                 .id(1L)
                 .username("test")
                 .email("test@email.com")
-                .password("testCryptPassword")
-                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByUsername(userDto.getUsername()))
                 .thenReturn(Optional.of(user));
-        when(passwordEncoder.encode(user.getPassword()))
-                .thenReturn("testCryptPassword");
         when(userRepository.save(user))
                 .thenReturn(user);
         when(modelMapper.map(user, UserDto.class))
@@ -214,7 +234,6 @@ public class UserServiceImplTest {
 
         verify(userRepository).findByUsername(userDto.getUsername());
         verify(modelMapper).map(userDto, user);
-        verify(passwordEncoder).encode(user.getPassword());
         verify(userRepository).save(userArgumentCaptor.capture());
         verify(modelMapper).map(user, UserDto.class);
         User capturedUser = userArgumentCaptor.getValue();
@@ -223,7 +242,6 @@ public class UserServiceImplTest {
                 "Grouped Assertions of User",
                 () -> assertEquals(user.getUsername(), capturedUser.getUsername()),
                 () -> assertEquals(user.getEmail(), capturedUser.getEmail()),
-                () -> assertEquals(user.getPassword(), capturedUser.getPassword()),
                 () -> assertNotNull(updatedUser)
         );
     }
@@ -247,38 +265,31 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("Update user test when user dto password is null then correct")
-    void updateUserTestWhenUserDtoPasswordIsNullThenCorrect() {
+    @DisplayName("Update user test when user dto password is not null then throw")
+    void updateUserTestWhenUserDtoPasswordIsNotNullThenThrow() {
 
         UserDto userDto = UserDto.builder()
-                .id(1L)
                 .username("test")
+                .password("Test123")
                 .build();
 
         User user = User.builder()
-                .id(1L)
                 .username("test")
-                .email("test@email.com")
-                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByUsername(userDto.getUsername()))
                 .thenReturn(Optional.of(user));
-        when(userRepository.save(user))
-                .thenReturn(user);
-        when(modelMapper.map(user, UserDto.class))
-                .thenReturn(userDto);
 
-        UserDto updatedUser = userService.updateUser(userDto);
+        assertThrows(IllegalPasswordArgumentException.class, () -> {
+            UserDto updatedUser = userService.updateUser(userDto);
 
-        verify(userRepository).findByUsername(userDto.getUsername());
-        verify(modelMapper).map(userDto, user);
-        verify(userRepository).save(user);
-        verify(modelMapper).map(user, UserDto.class);
+            verify(userRepository).findByUsername(userDto.getUsername());
+            verify(modelMapper, never()).map(userDto, user);
+            verify(userRepository, never()).save(user);
+            verify(modelMapper, never()).map(user, UserDto.class);
 
-        verify(passwordEncoder, never()).encode(anyString());
-
-        assertNotNull(updatedUser, "Updated user should not be null");
+            assertNull(updatedUser);
+        });
     }
 
     @Test

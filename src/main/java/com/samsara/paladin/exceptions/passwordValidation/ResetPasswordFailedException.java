@@ -1,4 +1,4 @@
-package com.samsara.paladin.exceptions.user;
+package com.samsara.paladin.exceptions.passwordValidation;
 
 import jakarta.validation.constraints.NotEmpty;
 

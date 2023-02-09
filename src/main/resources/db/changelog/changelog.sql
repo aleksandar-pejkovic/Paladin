@@ -112,7 +112,8 @@ INSERT INTO permissions VALUES
 	(1, 'READ'),
 	(2, 'WRITE'),
 	(3, 'UPDATE'),
-	(4, 'DELETE');
+	(4, 'DELETE'),
+	(5, 'GRANT_ADMIN');
 
 CREATE TABLE roles_permissions (
   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -129,6 +130,7 @@ CREATE TABLE roles_permissions (
 
 INSERT INTO roles_permissions (role_id, permission_id) VALUES
     (1, 4),
+    (1, 5),
     (2, 1),
     (2, 2),
     (2, 3);
