@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.samsara.paladin.dto.HeroDto;
@@ -148,13 +147,11 @@ public class HeroServiceImpl implements HeroService {
         return convertHeroesToDtoList(heroRepository.findByOrderByCreationDateDesc());
     }
 
-    private void publishHeroEvent(String name, EventAction action) {
-        String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+    private void publishHeroEvent(String heroName, EventAction action) {
         eventPublisher.publishEvent(
                 EventCategory.HERO,
-                name,
-                action,
-                loggedInUsername
+                heroName,
+                action
         );
     }
 

@@ -22,14 +22,6 @@ public interface UserRepository extends ListCrudRepository<User, Long> {
     )
     Optional<User> findUserWithRolesFetched(@Param("username") String username);
 
-    @Query(
-            "SELECT u "
-                    + "FROM User u "
-                    + "JOIN FETCH u.heroes "
-                    + "WHERE u.username = :username "
-    )
-    Optional<User> findUserWithHeroesFetched(@Param("username") String username);
-
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);
@@ -45,6 +37,14 @@ public interface UserRepository extends ListCrudRepository<User, Long> {
     List<User> findByEnabled(boolean enabled);
 
     List<User> findByRoles(Role role);
+
+    @Query(
+            "SELECT u.email "
+                    + "FROM User u "
+                    + "JOIN u.roles r "
+                    + "WHERE r.id=1 "
+    )
+    List<String> findAdminEmails();
 
     boolean existsByUsername(String username);
 

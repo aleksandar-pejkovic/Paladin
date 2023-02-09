@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.samsara.paladin.enums.EventAction;
@@ -23,16 +24,17 @@ public class CustomEventPublisher {
     public void publishEvent(
             final EventCategory category,
             final String object,
-            final EventAction action,
-            final String username
+            final EventAction action
     ) {
+
+        String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         System.out.println("Publishing custom event. ");
 
         Event event = Event.builder()
                 .category(category)
                 .object(object)
                 .action(action)
-                .username(username)
+                .username(loggedInUsername)
                 .date(new Date())
                 .build();
 

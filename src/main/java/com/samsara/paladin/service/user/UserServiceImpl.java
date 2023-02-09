@@ -2,13 +2,13 @@ package com.samsara.paladin.service.user;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -205,12 +205,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void publishUserEvent(String username, EventAction action) {
-        String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         eventPublisher.publishEvent(
                 EventCategory.USER,
                 username,
-                action,
-                loggedInUsername
+                action
         );
     }
 
@@ -223,6 +221,9 @@ public class UserServiceImpl implements UserService {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
+        if (user.getHeroes() == null) {
+            user.setHeroes(new HashSet<>());
+        }
         userDto.setHeroCount(user.getHeroes().size());
         return userDto;
     }
