@@ -2,7 +2,6 @@ package com.samsara.paladin.service.user;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -226,10 +225,11 @@ public class UserServiceImpl implements UserService {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        if (user.getHeroes() == null) {
-            user.setHeroes(new HashSet<>());
+        if (user.getHeroes() != null) {
+            userDto.setHeroCount(user.getHeroes().size());
+        } else {
+            userDto.setHeroCount(0);
         }
-        userDto.setHeroCount(user.getHeroes().size());
         return userDto;
     }
 

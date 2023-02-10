@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,6 +69,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private Set<Hero> heroes;
+
+    @OneToOne(mappedBy = "user")
+    private Avatar avatar;
 
     public boolean isAdmin() {
         return roles.stream()

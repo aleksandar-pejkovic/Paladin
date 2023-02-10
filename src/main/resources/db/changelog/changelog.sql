@@ -145,6 +145,20 @@ CREATE TABLE events (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE avatars (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    image_name VARCHAR(60) NOT NULL,
+    image_type VARCHAR(60) NOT NULL,
+    image MEDIUMBLOB NOT NULL,
+    user_id INT(11) NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
 --CREATE TABLE properties (
 --    property_id VARCHAR(36),
 --    name VARCHAR(36),
@@ -172,16 +186,3 @@ CREATE TABLE events (
 --        ON UPDATE NO ACTION
 --    );
 --
---CREATE TABLE avatars (
---    id BIGINT(20) NOT NULL AUTO_INCREMENT,
---    image_name VARCHAR(255) NOT NULL,
---    image_type VARCHAR(255) NOT NULL,
---    image MEDIUMBLOB NOT NULL,
---    user_id VARCHAR(36) NOT NULL,
---    PRIMARY KEY (id),
---    CONSTRAINT
---        FOREIGN KEY (user_id)
---        REFERENCES samsara.users(user_id)
---        ON DELETE NO ACTION
---        ON UPDATE NO ACTION
---);

@@ -46,7 +46,7 @@ public class HeroController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<HeroDto> updateUserAccount(@Valid @RequestBody HeroDto heroDto) {
+    public ResponseEntity<HeroDto> updateHero(@Valid @RequestBody HeroDto heroDto) {
         HeroDto heroResponse = heroService.updateHero(heroDto);
         return new ResponseEntity<>(heroResponse, HttpStatus.OK);
     }
