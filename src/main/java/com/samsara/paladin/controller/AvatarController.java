@@ -2,6 +2,7 @@ package com.samsara.paladin.controller;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,21 +21,20 @@ import org.springframework.web.multipart.MultipartFile;
 import com.samsara.paladin.model.Avatar;
 import com.samsara.paladin.service.avatar.AvatarServiceImpl;
 
+import jakarta.validation.constraints.NotNull;
+
 @RestController
 @RequestMapping("/api/avatars")
 @Validated
 public class AvatarController {
 
-    private final AvatarServiceImpl avatarService;
-
-    public AvatarController(AvatarServiceImpl avatarService) {
-        this.avatarService = avatarService;
-    }
+    @Autowired
+    private AvatarServiceImpl avatarService;
 
     @PostMapping("/new")
-    public ResponseEntity<String> placeNewAvatarOnUser(
+    public ResponseEntity<String> assignNewAvatarToUser(
             Authentication authentication,
-            @RequestParam("image") MultipartFile file
+            @NotNull @RequestParam("image") MultipartFile file
     ) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Must upload file!", HttpStatus.BAD_REQUEST);
@@ -45,7 +45,7 @@ public class AvatarController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/username/{username}",
             produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
-    public @ResponseBody ResponseEntity<byte[]> fetchAvatarFromUser(
+    public @ResponseBody ResponseEntity<byte[]> readAvatarFromUser(
             @PathVariable("username")
             String username
     ) {

@@ -16,7 +16,7 @@ import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.RoleName;
-import com.samsara.paladin.events.CustomEventPublisher;
+import com.samsara.paladin.events.EventPublisher;
 import com.samsara.paladin.exceptions.passwordValidation.IllegalPasswordArgumentException;
 import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissingException;
 import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
@@ -32,36 +32,20 @@ import com.samsara.paladin.repository.UserRepository;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    private final ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-    private CustomEventPublisher eventPublisher;
+    @Autowired
+    private EventPublisher eventPublisher;
 
+    @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
-        this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
-    }
-
-    @Autowired
-    public void setRoleRepository(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Autowired
-    public void setEventPublisher(CustomEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
 
     public UserDto registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
@@ -78,7 +62,7 @@ public class UserServiceImpl implements UserService {
         User user = convertUserToEntity(userDto);
         encryptUserPassword(user);
         assignDefaultRoleToUser(user);
-        User registeredUser = saveUser(user);
+        User registeredUser = userRepository.save(user);
         publishUserEvent(registeredUser.getUsername(), EventAction.REGISTER);
         return convertUserToDto(registeredUser);
     }
@@ -89,12 +73,15 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("Username '" + userDto.getUsername() + "' not found!");
         }
-        User storedUser = optionalUser.get();
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new EmailExistsException("Account with email '" + userDto.getEmail() + "' already exist!");
+        }
+        User currentUser = optionalUser.get();
         if (userDto.getPassword() != null) {
             throw new IllegalPasswordArgumentException("Please use 'password reset' option for password update!");
         }
-        modelMapper.map(userDto, storedUser);
-        User updatedUser = saveUser(storedUser);
+        modelMapper.map(userDto, currentUser);
+        User updatedUser = userRepository.save(currentUser);
         publishUserEvent(updatedUser.getUsername(), EventAction.EDIT);
         return convertUserToDto(updatedUser);
     }
@@ -105,7 +92,7 @@ public class UserServiceImpl implements UserService {
         userRepository.findByUsername(resetPasswordDetails.getUsername())
                 .filter(user -> user.getSecretAnswer().equals(resetPasswordDetails.getSecretAnswer()))
                 .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
-                .map(this::saveUser)
+                .map(userRepository::save)
                 .orElseThrow(
                         () -> new ResetPasswordFailedException("Password reset failed! Wrong data!")
                 );
@@ -119,9 +106,9 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("Username '" + username + "' not found!");
         }
-        User storedUser = optionalUser.get();
-        storedUser.getRoles().add(roleRepository.findByName(RoleName.ADMIN));
-        User adminUser = saveUser(storedUser);
+        User currentUser = optionalUser.get();
+        currentUser.getRoles().add(roleRepository.findByName(RoleName.ADMIN));
+        User adminUser = userRepository.save(currentUser);
         publishUserEvent(adminUser.getUsername(), EventAction.GRANT_ADMIN);
         return convertUserToDto(adminUser);
     }
@@ -132,8 +119,9 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isEmpty()) {
             throw new UsernameNotFoundException("Username '" + username + "' not found!");
         }
-        userRepository.delete(optionalUser.get());
-        publishUserEvent(optionalUser.get().getUsername(), EventAction.DELETE);
+        User currentUser = optionalUser.get();
+        userRepository.delete(currentUser);
+        publishUserEvent(currentUser.getUsername(), EventAction.DELETE);
     }
 
     @Override
@@ -202,10 +190,6 @@ public class UserServiceImpl implements UserService {
     private void assignDefaultRoleToUser(User user) {
         Role userRole = roleRepository.findByName(RoleName.USER);
         user.setRoles(Collections.singleton(userRole));
-    }
-
-    private User saveUser(User user) {
-        return userRepository.save(user);
     }
 
     private void publishUserEvent(String username, EventAction action) {

@@ -29,12 +29,8 @@ import jakarta.validation.constraints.NotBlank;
 @Validated
 public class UserController {
 
-    private final UserServiceImpl userService;
-
     @Autowired
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
-    }
+    private UserServiceImpl userService;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUserAccount(@Valid @RequestBody UserDto userDto) {
@@ -42,6 +38,7 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("#userDto.username == authentication.name or hasAuthority('SCOPE_UPDATE')")
     @PutMapping("/update")
     public ResponseEntity<UserDto> updateUserAccount(@Valid @RequestBody UserDto userDto) {
         UserDto userResponse = userService.updateUser(userDto);

@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
-import com.samsara.paladin.events.CustomEventPublisher;
+import com.samsara.paladin.events.EventPublisher;
 import com.samsara.paladin.exceptions.user.UserNotFoundException;
 import com.samsara.paladin.model.Avatar;
 import com.samsara.paladin.repository.AvatarRepository;
@@ -26,21 +26,14 @@ public class AvatarServiceImpl implements AvatarService {
 
     private static final int NEW_IMAGE_HEIGHT = 128;
 
-    private final AvatarRepository avatarRepository;
-
-    private final UserRepository userRepository;
-
-    private CustomEventPublisher eventPublisher;
-
-    public AvatarServiceImpl(AvatarRepository avatarRepository, UserRepository userRepository) {
-        this.avatarRepository = avatarRepository;
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private AvatarRepository avatarRepository;
 
     @Autowired
-    public void setEventPublisher(CustomEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
+    private UserRepository userRepository;
+
+    @Autowired
+    private EventPublisher eventPublisher;
 
     @Override
     public void assignAvatarToUser(String username, MultipartFile file) {

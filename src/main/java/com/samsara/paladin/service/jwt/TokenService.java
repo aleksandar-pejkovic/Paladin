@@ -17,12 +17,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
 
-    private final JwtEncoder encoder;
-
     @Autowired
-    public TokenService(JwtEncoder encoder) {
-        this.encoder = encoder;
-    }
+    private JwtEncoder encoder;
 
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();

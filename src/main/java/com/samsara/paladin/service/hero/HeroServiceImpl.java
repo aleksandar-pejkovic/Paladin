@@ -13,7 +13,7 @@ import com.samsara.paladin.dto.HeroDto;
 import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.HeroType;
-import com.samsara.paladin.events.CustomEventPublisher;
+import com.samsara.paladin.events.EventPublisher;
 import com.samsara.paladin.exceptions.hero.HeroExistsException;
 import com.samsara.paladin.exceptions.hero.HeroNotFoundException;
 import com.samsara.paladin.exceptions.hero.HeroTypeNotFoundException;
@@ -26,29 +26,17 @@ import com.samsara.paladin.repository.UserRepository;
 @Service
 public class HeroServiceImpl implements HeroService {
 
-    private final HeroRepository heroRepository;
+    @Autowired
+    private HeroRepository heroRepository;
 
-    private final ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-    private CustomEventPublisher eventPublisher;
+    @Autowired
+    private EventPublisher eventPublisher;
 
+    @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    public HeroServiceImpl(HeroRepository heroRepository, ModelMapper modelMapper) {
-        this.heroRepository = heroRepository;
-        this.modelMapper = modelMapper;
-    }
-
-    @Autowired
-    public void setEventPublisher(CustomEventPublisher eventPublisher) {
-        this.eventPublisher = eventPublisher;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public HeroDto createHero(HeroDto heroDto) {
@@ -144,7 +132,7 @@ public class HeroServiceImpl implements HeroService {
 
     @Override
     public List<HeroDto> loadLast10AddedHeroes() {
-        return convertHeroesToDtoList(heroRepository.findByOrderByCreationDateDesc());
+        return convertHeroesToDtoList(heroRepository.findFirst10ByOrderByCreationDateDesc());
     }
 
     private void publishHeroEvent(String heroName, EventAction action) {

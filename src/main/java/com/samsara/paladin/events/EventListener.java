@@ -1,29 +1,25 @@
 package com.samsara.paladin.events;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.samsara.paladin.model.Event;
 import com.samsara.paladin.repository.EventRepository;
-import com.samsara.paladin.service.email.EmailService;
+import com.samsara.paladin.service.email.EmailServiceImpl;
 
 @Component
-public class CustomEventListener {
-
-    private final EventRepository eventRepository;
+public class EventListener {
 
     @Autowired
-    private EmailService emailService;
+    private EventRepository eventRepository;
 
-    public CustomEventListener(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
+    @Autowired
+    private EmailServiceImpl emailService;
 
-    @EventListener
+    @org.springframework.context.event.EventListener
     public void onApplicationEvent(Event event) {
         eventRepository.save(event);
-        System.out.println("New event noted in '" + event.getCategory().name() + "' category.");
+        System.out.println(event.getDate() + " Event noted in '" + event.getCategory().name() + "' category.");
         emailService.sendEmailToAdmin(event);
         System.out.println("Email notification sent to admin(s).");
     }

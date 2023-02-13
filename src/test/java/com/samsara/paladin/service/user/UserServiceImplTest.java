@@ -37,7 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.RoleName;
-import com.samsara.paladin.events.CustomEventPublisher;
+import com.samsara.paladin.events.EventPublisher;
 import com.samsara.paladin.exceptions.passwordValidation.IllegalPasswordArgumentException;
 import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissingException;
 import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
@@ -61,7 +61,7 @@ public class UserServiceImplTest {
     private ModelMapper modelMapper;
 
     @MockBean
-    private CustomEventPublisher eventPublisher;
+    private EventPublisher eventPublisher;
 
     @MockBean
     private UserRepository userRepository;

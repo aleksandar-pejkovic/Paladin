@@ -3,12 +3,15 @@ package com.samsara.paladin.service.email;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.samsara.paladin.dto.EmailDetails;
 import com.samsara.paladin.model.Event;
@@ -21,15 +24,13 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.username}")
     private String sender;
 
-    private final JavaMailSender emailSender;
+    @Autowired
+    private JavaMailSender emailSender;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public EmailServiceImpl(JavaMailSender emailSender, UserRepository userRepository) {
-        this.emailSender = emailSender;
-        this.userRepository = userRepository;
-    }
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Async
     @Override
     public void sendEmailToAdmin(Event event) {
@@ -38,7 +39,7 @@ public class EmailServiceImpl implements EmailService {
         String[] adminEmails = adminEmailsList.toArray(new String[0]);
 
         boolean isAdmin = false;
-        Optional<User> optionalUser = userRepository.findUserWithRolesFetched(event.getUsername());
+        Optional<User> optionalUser = userRepository.findByUsername(event.getUsername());
         if (optionalUser.isPresent()) {
             isAdmin = optionalUser.get().isAdmin();
         }

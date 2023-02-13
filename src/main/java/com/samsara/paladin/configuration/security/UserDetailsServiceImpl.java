@@ -12,30 +12,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.samsara.paladin.model.Permission;
 import com.samsara.paladin.model.Role;
 import com.samsara.paladin.model.User;
-import com.samsara.paladin.repository.PermissionRepository;
 import com.samsara.paladin.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final PermissionRepository permissionRepository;
-
     @Autowired
-    public UserDetailsServiceImpl(UserRepository userRepository, PermissionRepository permissionRepository) {
-        this.userRepository = userRepository;
-        this.permissionRepository = permissionRepository;
-    }
+    private UserRepository userRepository;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        Optional<User> user = userRepository.findUserWithRolesFetched(username);
+        Optional<User> user = userRepository.findByUsername(username);
 
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Username '" + username + "' not found!");
@@ -66,7 +62,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<Permission> permissions = new ArrayList<>();
         for (Role role : roles) {
             grantedAuthorities.add(role.getName().getAuthority());
-            permissions.addAll(permissionRepository.getPermissionsByRole(role.getName()));
+            permissions.addAll(role.getPermissions());
         }
         for (Permission permission : permissions) {
             grantedAuthorities.add(permission.getName().name());

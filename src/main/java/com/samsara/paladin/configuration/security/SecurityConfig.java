@@ -22,13 +22,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.samsara.paladin.enums.PermissionName;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
     @Value("${jwt.key}")
@@ -58,8 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/users/password-reset").permitAll()
-                        .requestMatchers("/api/auth/token").authenticated()
-                        .anyRequest().hasAuthority(PermissionName.READ.getAuthority())
+                        .requestMatchers("/api/users/register").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)

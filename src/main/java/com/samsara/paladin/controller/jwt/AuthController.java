@@ -12,12 +12,8 @@ import com.samsara.paladin.service.jwt.TokenService;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final TokenService tokenService;
-
     @Autowired
-    public AuthController(TokenService tokenService) {
-        this.tokenService = tokenService;
-    }
+    private TokenService tokenService;
 
     @PostMapping("/token")
     public String token(Authentication authentication) {

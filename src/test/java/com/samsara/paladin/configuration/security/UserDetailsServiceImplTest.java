@@ -6,12 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +28,6 @@ import com.samsara.paladin.enums.RoleName;
 import com.samsara.paladin.model.Permission;
 import com.samsara.paladin.model.Role;
 import com.samsara.paladin.model.User;
-import com.samsara.paladin.repository.PermissionRepository;
 import com.samsara.paladin.repository.UserRepository;
 
 @ExtendWith(SpringExtension.class)
@@ -43,9 +39,6 @@ class UserDetailsServiceImplTest {
 
     @MockBean
     private UserRepository userRepository;
-
-    @MockBean
-    private PermissionRepository permissionRepository;
 
     @Test
     @DisplayName("Load user by username test when credentials are valid then correct")
@@ -78,15 +71,12 @@ class UserDetailsServiceImplTest {
                 .roles(roles)
                 .build();
 
-        when(userRepository.findUserWithRolesFetched(user.getUsername()))
+        when(userRepository.findByUsername(user.getUsername()))
                 .thenReturn(Optional.of(user));
-        when(permissionRepository.getPermissionsByRole(RoleName.USER))
-                .thenReturn(new ArrayList<>(permissions));
 
         UserDetails authorizedUser = userDetailsService.loadUserByUsername(user.getUsername());
 
-        verify(userRepository).findUserWithRolesFetched(user.getUsername());
-        verify(permissionRepository).getPermissionsByRole(RoleName.USER);
+        verify(userRepository).findByUsername(user.getUsername());
 
         assertAll(
                 () -> assertEquals(user.getUsername(), authorizedUser.getUsername()),
@@ -103,13 +93,12 @@ class UserDetailsServiceImplTest {
     @DisplayName("Load user by username test when credentials not valid then throw")
     void loadUserByUsernameTestWhenCredentialsNotValidThenThrow() {
 
-        when(userRepository.findUserWithRolesFetched("test"))
+        when(userRepository.findByUsername("test"))
                 .thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> {
             UserDetails authorizedUser = userDetailsService.loadUserByUsername("test");
-            verify(userRepository).findUserWithRolesFetched("test");
-            verify(permissionRepository, never()).getPermissionsByRole(any());
+            verify(userRepository).findByUsername("test");
             assertNull(authorizedUser);
         });
     }

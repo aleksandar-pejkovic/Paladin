@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,29 +33,28 @@ public class HeroController {
 
     private static final int MAX_LEVEL = 80;
 
-    private final HeroServiceImpl heroService;
-
     @Autowired
-    public HeroController(HeroServiceImpl heroService) {
-        this.heroService = heroService;
-    }
+    private HeroServiceImpl heroService;
 
+    @PreAuthorize("#heroDto.username == authentication.name")
     @PostMapping("/create")
     public ResponseEntity<HeroDto> createHero(@Valid @RequestBody HeroDto heroDto) {
         HeroDto heroResponse = heroService.createHero(heroDto);
         return new ResponseEntity<>(heroResponse, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("#heroDto.username == authentication.name")
     @PutMapping("/update")
     public ResponseEntity<HeroDto> updateHero(@Valid @RequestBody HeroDto heroDto) {
         HeroDto heroResponse = heroService.updateHero(heroDto);
         return new ResponseEntity<>(heroResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{name}")
-    public String removeHero(@PathVariable @NotBlank String name) {
-        heroService.deleteHero(name);
-        return "Hero '" + name + "' deleted!";
+    @PreAuthorize("#heroDto.username == authentication.name")
+    @DeleteMapping("/delete")
+    public String removeHero(@RequestBody HeroDto heroDto) {
+        heroService.deleteHero(heroDto.getName());
+        return "Hero '" + heroDto.getName() + "' deleted!";
     }
 
     @GetMapping("/all")

@@ -27,7 +27,7 @@ public interface HeroRepository extends ListCrudRepository<Hero, Long> {
 
     List<Hero> findFirst10ByOrderByLevelDesc();
 
-    List<Hero> findByOrderByCreationDateDesc();
+    List<Hero> findFirst10ByOrderByCreationDateDesc();
 
     boolean existsByName(String name);
 }

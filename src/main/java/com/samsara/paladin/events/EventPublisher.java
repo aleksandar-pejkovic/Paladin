@@ -12,14 +12,10 @@ import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.model.Event;
 
 @Component
-public class CustomEventPublisher {
-
-    private final ApplicationEventPublisher applicationEventPublisher;
+public class EventPublisher {
 
     @Autowired
-    public CustomEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public void publishEvent(
             final EventCategory category,
