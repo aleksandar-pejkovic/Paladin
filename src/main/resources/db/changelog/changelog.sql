@@ -113,7 +113,8 @@ INSERT INTO permissions VALUES
 	(2, 'WRITE'),
 	(3, 'UPDATE'),
 	(4, 'DELETE'),
-	(5, 'GRANT_ADMIN');
+	(5, 'GRANT_ADMIN'),
+	(6, 'READ_EVENTS');
 
 CREATE TABLE roles_permissions (
   id INT(11) NOT NULL AUTO_INCREMENT,
@@ -129,11 +130,12 @@ CREATE TABLE roles_permissions (
   );
 
 INSERT INTO roles_permissions (role_id, permission_id) VALUES
+    (1, 2),
+    (1, 3),
     (1, 4),
     (1, 5),
-    (2, 1),
-    (2, 2),
-    (2, 3);
+    (1, 6),
+    (2, 1);
 
 CREATE TABLE events (
     id INT(11) NOT NULL AUTO_INCREMENT,
@@ -155,8 +157,7 @@ CREATE TABLE avatars (
     CONSTRAINT
         FOREIGN KEY (user_id)
         REFERENCES users(id)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION
+        ON DELETE CASCADE
 );
 
 --CREATE TABLE properties (

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
@@ -45,7 +46,12 @@ public class EmailServiceImpl implements EmailService {
         EmailDetails emailDetails = new EmailDetails(event, isAdmin);
 
         SimpleMailMessage message = getSimpleMailMessage(adminEmails, emailDetails);
-        emailSender.send(message);
+        try {
+            emailSender.send(message);
+        } catch (MailSendException e) {
+            System.out.println("Mail server connection failed. Email was not sent to admin(s)!");
+        }
+
     }
 
     private SimpleMailMessage getSimpleMailMessage(String[] adminEmails, EmailDetails emailDetails) {

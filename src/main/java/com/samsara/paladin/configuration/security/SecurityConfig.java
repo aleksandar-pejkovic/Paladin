@@ -26,7 +26,9 @@ import com.samsara.paladin.enums.PermissionName;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(
+        securedEnabled = true,
+        jsr250Enabled = true)
 public class SecurityConfig {
 
     @Value("${jwt.key}")
@@ -55,6 +57,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/users/password-reset").permitAll()
                         .requestMatchers("/api/auth/token").authenticated()
                         .anyRequest().hasAuthority(PermissionName.READ.getAuthority())
                 )

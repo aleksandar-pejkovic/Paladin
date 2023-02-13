@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,12 +54,14 @@ public class UserController {
         return new ResponseEntity<>("Password changed!", HttpStatus.OK);
     }
 
+    @Secured("SCOPE_GRANT_ADMIN")
     @PutMapping("/promote/{username}")
     public ResponseEntity<UserDto> promoteUserToAdmin(@PathVariable @NotBlank String username) {
         UserDto userResponse = userService.grantAdminRoleToUser(username);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
+    @PreAuthorize("#username == authentication.name or hasAuthority('SCOPE_DELETE')")
     @DeleteMapping("/delete/{username}")
     public String removeUserAccount(@PathVariable @NotBlank String username) {
         userService.deleteUser(username);

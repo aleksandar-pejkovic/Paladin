@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.samsara.paladin.model.Avatar;
 import com.samsara.paladin.service.avatar.AvatarServiceImpl;
-
-import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/api/avatars")
@@ -34,13 +33,13 @@ public class AvatarController {
 
     @PostMapping("/new")
     public ResponseEntity<String> placeNewAvatarOnUser(
-            @RequestParam("username") @NotBlank String username,
+            Authentication authentication,
             @RequestParam("image") MultipartFile file
     ) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Must upload file!", HttpStatus.BAD_REQUEST);
         }
-        avatarService.assignAvatarToUser(username, file);
+        avatarService.assignAvatarToUser(authentication.getName(), file);
         return new ResponseEntity<>("Avatar saved!", HttpStatus.CREATED);
     }
 
