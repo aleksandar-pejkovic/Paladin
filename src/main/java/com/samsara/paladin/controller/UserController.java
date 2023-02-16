@@ -17,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.samsara.paladin.configuration.validation.user.name.Name;
+import com.samsara.paladin.configuration.validation.user.username.Username;
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.service.user.UserServiceImpl;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 
 @RestController
 @RequestMapping("/api/users")
@@ -53,14 +55,14 @@ public class UserController {
 
     @Secured("SCOPE_GRANT_ADMIN")
     @PutMapping("/promote/{username}")
-    public ResponseEntity<UserDto> promoteUserToAdmin(@PathVariable @NotBlank String username) {
+    public ResponseEntity<UserDto> promoteUserToAdmin(@PathVariable @Username String username) {
         UserDto userResponse = userService.grantAdminRoleToUser(username);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
     @PreAuthorize("#username == authentication.name or hasAuthority('SCOPE_DELETE')")
     @DeleteMapping("/delete/{username}")
-    public String removeUserAccount(@PathVariable @NotBlank String username) {
+    public String removeUserAccount(@PathVariable @Username String username) {
         userService.deleteUser(username);
         return "User '" + username + "' deleted!";
     }
@@ -71,22 +73,22 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
-    public UserDto fetchUsersByUsername(@PathVariable @NotBlank String username) {
+    public UserDto fetchUsersByUsername(@PathVariable @Username String username) {
         return userService.loadUserByUsername(username);
     }
 
     @GetMapping("/email/{email}")
-    public UserDto fetchUsersByEmail(@PathVariable @NotBlank String email) {
+    public UserDto fetchUsersByEmail(@PathVariable @Email String email) {
         return userService.loadUserByEmail(email);
     }
 
     @GetMapping("/firstName/{firstName}")
-    public List<UserDto> fetchUsersByFirstName(@PathVariable @NotBlank String firstName) {
+    public List<UserDto> fetchUsersByFirstName(@PathVariable @Name String firstName) {
         return userService.loadUsersByFirstName(firstName);
     }
 
     @GetMapping("/lastName/{lastName}")
-    public List<UserDto> fetchUsersByLastName(@PathVariable @NotBlank String lastName) {
+    public List<UserDto> fetchUsersByLastName(@PathVariable @Name String lastName) {
         return userService.loadUsersByLastName(lastName);
     }
 

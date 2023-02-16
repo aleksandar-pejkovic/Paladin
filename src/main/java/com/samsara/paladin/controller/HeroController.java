@@ -16,22 +16,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.samsara.paladin.configuration.validation.hero.level.HeroLevel;
+import com.samsara.paladin.configuration.validation.hero.name.HeroName;
+import com.samsara.paladin.configuration.validation.user.username.Username;
 import com.samsara.paladin.dto.HeroDto;
 import com.samsara.paladin.service.hero.HeroServiceImpl;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("/api/heroes")
 @Validated
 public class HeroController {
-
-    private static final int MIN_LEVEL = 0;
-
-    private static final int MAX_LEVEL = 80;
 
     @Autowired
     private HeroServiceImpl heroService;
@@ -63,27 +59,27 @@ public class HeroController {
     }
 
     @GetMapping("/name/{name}")
-    public HeroDto fetchHeroByName(@PathVariable @NotBlank String name) {
+    public HeroDto fetchHeroByName(@PathVariable @HeroName String name) {
         return heroService.loadHeroByName(name);
     }
 
     @GetMapping("/username/{username}")
-    public List<HeroDto> fetchHeroesByUser(@PathVariable @NotBlank String username) {
+    public List<HeroDto> fetchHeroesByUser(@PathVariable @Username String username) {
         return heroService.loadHeroesByUser(username);
     }
 
     @GetMapping("/level/{level}")
-    public List<HeroDto> fetchHeroesByLevel(@PathVariable @Min(MIN_LEVEL) @Max(MAX_LEVEL) Integer level) {
+    public List<HeroDto> fetchHeroesByLevel(@PathVariable @HeroLevel Integer level) {
         return heroService.loadHeroesByLevel(level);
     }
 
     @GetMapping("/min-level/{level}")
-    public List<HeroDto> fetchHeroesByMinLevel(@PathVariable @Min(MIN_LEVEL) @Max(MAX_LEVEL) Integer level) {
+    public List<HeroDto> fetchHeroesByMinLevel(@PathVariable @HeroLevel Integer level) {
         return heroService.loadHeroesByMinLevel(level);
     }
 
     @GetMapping("/max-level/{level}")
-    public List<HeroDto> fetchHeroesByMaxLevel(@PathVariable @Min(MIN_LEVEL) @Max(MAX_LEVEL) Integer level) {
+    public List<HeroDto> fetchHeroesByMaxLevel(@PathVariable @HeroLevel Integer level) {
         return heroService.loadHeroesByMaxLevel(level);
     }
 
