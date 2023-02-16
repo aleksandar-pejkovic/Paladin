@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
                 .map(userRepository::save)
                 .orElseThrow(
-                        () -> new ResetPasswordFailedException("Password reset failed! Wrong data!")
+                        () -> new ResetPasswordFailedException("Password reset failed! Incorrect data!")
                 );
         publishUserEvent(resetPasswordDetails.getUsername(), EventAction.CHANGE_PASSWORD);
         return true;

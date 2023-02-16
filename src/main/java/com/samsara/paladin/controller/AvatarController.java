@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.samsara.paladin.configuration.validation.user.username.Username;
 import com.samsara.paladin.model.Avatar;
 import com.samsara.paladin.service.avatar.AvatarServiceImpl;
 
@@ -34,7 +35,7 @@ public class AvatarController {
     @PostMapping("/new")
     public ResponseEntity<String> assignNewAvatarToUser(
             Authentication authentication,
-            @NotNull @RequestParam("image") MultipartFile file
+            @RequestParam("image") @NotNull MultipartFile file
     ) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Must upload file!", HttpStatus.BAD_REQUEST);
@@ -47,6 +48,7 @@ public class AvatarController {
             produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
     public @ResponseBody ResponseEntity<byte[]> readAvatarFromUser(
             @PathVariable("username")
+            @Username
             String username
     ) {
 
