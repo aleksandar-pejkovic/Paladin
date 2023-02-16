@@ -1,4 +1,4 @@
-package com.samsara.paladin.configuration.validation.user.username;
+package com.samsara.paladin.configuration.validation.user.about;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,13 +10,12 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = UsernameValidator.class)
-@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Constraint(validatedBy = AboutValidator.class)
+@Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Username {
+public @interface AboutConstraint {
 
-    String message() default "Username must contain only lower case letters and numbers, "
-            + "must start with a letter, and must be 3-35 characters long!";
+    String message() default "Incorrect format!";
 
     Class<?>[] groups() default {};
 

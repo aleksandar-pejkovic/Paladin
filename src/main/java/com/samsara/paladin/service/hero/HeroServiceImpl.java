@@ -13,7 +13,7 @@ import com.samsara.paladin.dto.HeroDto;
 import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.HeroType;
-import com.samsara.paladin.events.EventPublisher;
+import com.samsara.paladin.events.CustomEventPublisher;
 import com.samsara.paladin.exceptions.hero.HeroExistsException;
 import com.samsara.paladin.exceptions.hero.HeroNotFoundException;
 import com.samsara.paladin.exceptions.hero.HeroTypeNotFoundException;
@@ -33,7 +33,7 @@ public class HeroServiceImpl implements HeroService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private EventPublisher eventPublisher;
+    private CustomEventPublisher customEventPublisher;
 
     @Autowired
     private UserRepository userRepository;
@@ -136,7 +136,7 @@ public class HeroServiceImpl implements HeroService {
     }
 
     private void publishHeroEvent(String heroName, EventAction action) {
-        eventPublisher.publishEvent(
+        customEventPublisher.publishEvent(
                 EventCategory.HERO,
                 heroName,
                 action

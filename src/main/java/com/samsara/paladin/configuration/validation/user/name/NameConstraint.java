@@ -1,4 +1,4 @@
-package com.samsara.paladin.configuration.validation.user.about;
+package com.samsara.paladin.configuration.validation.user.name;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,12 +10,12 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = AboutValidator.class)
-@Target({ElementType.FIELD})
+@Constraint(validatedBy = NameValidator.class)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface About {
+public @interface NameConstraint {
 
-    String message() default "Incorrect format!";
+    String message() default "Invalid format!";
 
     Class<?>[] groups() default {};
 

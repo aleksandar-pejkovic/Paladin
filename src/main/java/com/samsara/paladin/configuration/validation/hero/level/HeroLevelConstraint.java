@@ -13,7 +13,7 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = HeroLevelValidator.class)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HeroLevel {
+public @interface HeroLevelConstraint {
 
     String message() default "Value must be between 0 and 80!";
 

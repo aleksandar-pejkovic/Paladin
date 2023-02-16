@@ -16,7 +16,7 @@ import com.samsara.paladin.dto.UserDto;
 import com.samsara.paladin.enums.EventAction;
 import com.samsara.paladin.enums.EventCategory;
 import com.samsara.paladin.enums.RoleName;
-import com.samsara.paladin.events.EventPublisher;
+import com.samsara.paladin.events.CustomEventPublisher;
 import com.samsara.paladin.exceptions.passwordValidation.IllegalPasswordArgumentException;
 import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissingException;
 import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private EventPublisher eventPublisher;
+    private CustomEventPublisher customEventPublisher;
 
     @Autowired
     private RoleRepository roleRepository;
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
                 .map(userRepository::save)
                 .orElseThrow(
-                        () -> new ResetPasswordFailedException("Password reset failed! Incorrect data!")
+                        () -> new ResetPasswordFailedException("Password reset failed! Invalid data!")
                 );
         publishUserEvent(resetPasswordDetails.getUsername(), EventAction.CHANGE_PASSWORD);
         return true;
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void publishUserEvent(String username, EventAction action) {
-        eventPublisher.publishEvent(
+        customEventPublisher.publishEvent(
                 EventCategory.USER,
                 username,
                 action

@@ -1,4 +1,4 @@
-package com.samsara.paladin.configuration.validation.user.securityQuestion;
+package com.samsara.paladin.configuration.validation.hero.name;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,12 +10,15 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = SecurityQuestionValidator.class)
+@Constraint(validatedBy = HeroNameValidator.class)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SecurityQuestion {
+public @interface HeroNameConstraint {
 
-    String message() default "Incorrect format!";
+    String message() default "Hero name may have more than one word "
+            + "with exactly one space between them. "
+            + "Words must contain only letters and numbers! "
+            + "Name length must be between 3 and 25!";
 
     Class<?>[] groups() default {};
 

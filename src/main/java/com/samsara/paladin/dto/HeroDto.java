@@ -2,9 +2,9 @@ package com.samsara.paladin.dto;
 
 import java.util.Date;
 
-import com.samsara.paladin.configuration.validation.hero.level.HeroLevel;
-import com.samsara.paladin.configuration.validation.hero.name.HeroName;
-import com.samsara.paladin.configuration.validation.hero.type.HeroType;
+import com.samsara.paladin.configuration.validation.hero.level.HeroLevelConstraint;
+import com.samsara.paladin.configuration.validation.hero.name.HeroNameConstraint;
+import com.samsara.paladin.configuration.validation.hero.type.HeroTypeConstraint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,13 +21,13 @@ public class HeroDto {
 
     private Long id;
 
-    @HeroName
+    @HeroNameConstraint
     private String name;
 
-    @HeroType
+    @HeroTypeConstraint
     private String type;
 
-    @HeroLevel
+    @HeroLevelConstraint
     private Integer level;
 
     private String username;

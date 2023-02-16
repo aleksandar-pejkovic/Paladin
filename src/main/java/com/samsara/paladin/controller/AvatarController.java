@@ -9,20 +9,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.samsara.paladin.configuration.validation.user.username.Username;
+import com.samsara.paladin.configuration.validation.user.username.UsernameConstraint;
 import com.samsara.paladin.model.Avatar;
 import com.samsara.paladin.service.avatar.AvatarServiceImpl;
-
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/api/avatars")
@@ -35,7 +33,7 @@ public class AvatarController {
     @PostMapping("/new")
     public ResponseEntity<String> assignNewAvatarToUser(
             Authentication authentication,
-            @RequestParam("image") @NotNull MultipartFile file
+            @RequestParam("image") MultipartFile file
     ) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Must upload file!", HttpStatus.BAD_REQUEST);
@@ -44,11 +42,16 @@ public class AvatarController {
         return new ResponseEntity<>("Avatar saved!", HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/username/{username}",
-            produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE})
+    @GetMapping(
+            path = "/username/{username}",
+            produces = {
+                    MediaType.IMAGE_PNG_VALUE,
+                    MediaType.IMAGE_JPEG_VALUE
+            }
+    )
     public @ResponseBody ResponseEntity<byte[]> readAvatarFromUser(
             @PathVariable("username")
-            @Username
+            @UsernameConstraint
             String username
     ) {
 

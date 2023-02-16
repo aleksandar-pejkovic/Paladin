@@ -1,4 +1,4 @@
-package com.samsara.paladin.configuration.validation.hero.type;
+package com.samsara.paladin.configuration.validation.user.securityQuestion;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,13 +10,12 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = HeroTypeValidator.class)
+@Constraint(validatedBy = SecurityQuestionValidator.class)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HeroType {
+public @interface SecurityQuestionConstraint {
 
-    String message() default "Hero type is not recognized as valid class! "
-            + "Name length must shorter than 60!";
+    String message() default "Invalid format of security question validation field!";
 
     Class<?>[] groups() default {};
 

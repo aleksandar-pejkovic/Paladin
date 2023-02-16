@@ -1,8 +1,8 @@
 package com.samsara.paladin.dto;
 
-import com.samsara.paladin.configuration.validation.user.password.Password;
-import com.samsara.paladin.configuration.validation.user.securityQuestion.SecurityQuestion;
-import com.samsara.paladin.configuration.validation.user.username.Username;
+import com.samsara.paladin.configuration.validation.user.password.PasswordConstraint;
+import com.samsara.paladin.configuration.validation.user.securityQuestion.SecurityQuestionConstraint;
+import com.samsara.paladin.configuration.validation.user.username.UsernameConstraint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,12 +17,12 @@ import lombok.Setter;
 @Builder
 public class ResetPasswordDetails {
 
-    @Username
+    @UsernameConstraint
     private String username;
 
-    @SecurityQuestion
+    @SecurityQuestionConstraint
     private String secretAnswer;
 
-    @Password
+    @PasswordConstraint
     private String newPassword;
 }

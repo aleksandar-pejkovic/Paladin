@@ -1,4 +1,4 @@
-package com.samsara.paladin.configuration.validation.hero.name;
+package com.samsara.paladin.configuration.validation.user.username;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,15 +10,13 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = HeroNameValidator.class)
+@Constraint(validatedBy = UsernameValidator.class)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HeroName {
+public @interface UsernameConstraint {
 
-    String message() default "Hero name may have more than one word "
-            + "with exactly one space between them. "
-            + "Words must contain only letters and numbers! "
-            + "Name length must be between 3 and 25!";
+    String message() default "Username must contain only lower case letters and numbers, "
+            + "must start with a letter, and must be 3-35 characters long!";
 
     Class<?>[] groups() default {};
 

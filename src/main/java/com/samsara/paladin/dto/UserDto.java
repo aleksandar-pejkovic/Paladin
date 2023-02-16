@@ -2,13 +2,14 @@ package com.samsara.paladin.dto;
 
 import java.util.Date;
 
-import com.samsara.paladin.configuration.validation.user.about.About;
-import com.samsara.paladin.configuration.validation.user.name.Name;
-import com.samsara.paladin.configuration.validation.user.password.Password;
-import com.samsara.paladin.configuration.validation.user.securityQuestion.SecurityQuestion;
-import com.samsara.paladin.configuration.validation.user.username.Username;
+import com.samsara.paladin.configuration.validation.user.about.AboutConstraint;
+import com.samsara.paladin.configuration.validation.user.name.NameConstraint;
+import com.samsara.paladin.configuration.validation.user.password.PasswordConstraint;
+import com.samsara.paladin.configuration.validation.user.securityQuestion.SecurityQuestionConstraint;
+import com.samsara.paladin.configuration.validation.user.username.UsernameConstraint;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,32 +23,25 @@ import lombok.Setter;
 @Builder
 public class UserDto {
 
-    private static final int DEFAULT_MIN_SIZE = 1;
-
-    private static final int DEFAULT_MAX_SIZE = 60;
-
-    private static final String DEFAULT_PATTERN = "^[a-zA-Z0-9ČĆŠĐŽčćšđž,.!? \\u0027-]+$";
-
-    private static final String DEFAULT_MESSAGE = "Incorrect format!";
-
     private Long id;
 
-    @Name
+    @NameConstraint
     private String firstName;
 
-    @Name
+    @NameConstraint
     private String lastName;
 
-    @Username
+    @UsernameConstraint
     private String username;
 
+    @NotNull
     @Email
     private String email;
 
-    @Password
+    @PasswordConstraint
     private String password;
 
-    @About
+    @AboutConstraint
     private String about;
 
     private Integer heroCount;
@@ -56,9 +50,9 @@ public class UserDto {
 
     private Boolean enabled;
 
-    @SecurityQuestion
+    @SecurityQuestionConstraint
     private String secretQuestion;
 
-    @SecurityQuestion
+    @SecurityQuestionConstraint
     private String secretAnswer;
 }
