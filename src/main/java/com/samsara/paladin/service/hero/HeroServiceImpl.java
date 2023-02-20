@@ -79,7 +79,11 @@ public class HeroServiceImpl implements HeroService {
 
     @Override
     public List<HeroDto> loadAllHeroes() {
-        return convertHeroesToDtoList(heroRepository.findAll());
+        List<Hero> heroes = heroRepository.findAll();
+        if (heroes.isEmpty()) {
+            throw new HeroNotFoundException("There are no heroes in the database!");
+        }
+        return convertHeroesToDtoList(heroes);
     }
 
     @Override
@@ -112,27 +116,47 @@ public class HeroServiceImpl implements HeroService {
 
     @Override
     public List<HeroDto> loadHeroesByLevel(Integer level) {
-        return convertHeroesToDtoList(heroRepository.findByLevel(level));
+        List<Hero> heroes = heroRepository.findByLevel(level);
+        if (heroes.isEmpty()) {
+            throw new HeroNotFoundException("There are no heroes with the level '" + level + "'!");
+        }
+        return convertHeroesToDtoList(heroes);
     }
 
     @Override
     public List<HeroDto> loadHeroesByMinLevel(Integer level) {
-        return convertHeroesToDtoList(heroRepository.findByLevelGreaterThan(level));
+        List<Hero> heroes = heroRepository.findByLevelGreaterThan(level);
+        if (heroes.isEmpty()) {
+            throw new HeroNotFoundException("There are no heroes with the level greater than '" + level + "'!");
+        }
+        return convertHeroesToDtoList(heroes);
     }
 
     @Override
     public List<HeroDto> loadHeroesByMaxLevel(Integer level) {
-        return convertHeroesToDtoList(heroRepository.findByLevelLessThan(level));
+        List<Hero> heroes = heroRepository.findByLevelLessThan(level);
+        if (heroes.isEmpty()) {
+            throw new HeroNotFoundException("There are no heroes with the level less than '" + level + "'!");
+        }
+        return convertHeroesToDtoList(heroes);
     }
 
     @Override
     public List<HeroDto> loadBest10HeroesByLevel() {
-        return convertHeroesToDtoList(heroRepository.findFirst10ByOrderByLevelDesc());
+        List<Hero> heroes = heroRepository.findFirst10ByOrderByLevelDesc();
+        if (heroes.isEmpty()) {
+            throw new HeroNotFoundException("There are no heroes in the database!");
+        }
+        return convertHeroesToDtoList(heroes);
     }
 
     @Override
     public List<HeroDto> loadLast10AddedHeroes() {
-        return convertHeroesToDtoList(heroRepository.findFirst10ByOrderByCreationDateDesc());
+        List<Hero> heroes = heroRepository.findFirst10ByOrderByCreationDateDesc();
+        if (heroes.isEmpty()) {
+            throw new HeroNotFoundException("There are no heroes in the database!");
+        }
+        return convertHeroesToDtoList(heroes);
     }
 
     private void publishHeroEvent(String heroName, EventAction action) {

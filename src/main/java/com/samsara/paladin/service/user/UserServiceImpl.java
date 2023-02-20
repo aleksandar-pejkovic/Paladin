@@ -22,6 +22,7 @@ import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissing
 import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
+import com.samsara.paladin.exceptions.user.UserNotFoundException;
 import com.samsara.paladin.exceptions.user.UsernameExistsException;
 import com.samsara.paladin.exceptions.user.UsernameNotFoundException;
 import com.samsara.paladin.model.Role;
@@ -126,7 +127,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> loadAllUsers() {
-        return convertUsersToDtoList(userRepository.findAll());
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There are no users in the database!");
+        }
+        return convertUsersToDtoList(users);
     }
 
     @Override
@@ -149,32 +154,56 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> loadUsersByFirstName(String firstName) {
-        return convertUsersToDtoList(userRepository.findByFirstName(firstName));
+        List<User> users = userRepository.findByFirstName(firstName);
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There is no user with first name '" + firstName + "'");
+        }
+        return convertUsersToDtoList(users);
     }
 
     @Override
     public List<UserDto> loadUsersByLastName(String lastName) {
-        return convertUsersToDtoList(userRepository.findByLastName(lastName));
+        List<User> users = userRepository.findByLastName(lastName);
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There is no user with last name '" + lastName + "'");
+        }
+        return convertUsersToDtoList(users);
     }
 
     @Override
     public List<UserDto> loadFirst10AddedUsers() {
-        return convertUsersToDtoList(userRepository.findFirst10ByOrderByCreationDateAsc());
+        List<User> users = userRepository.findFirst10ByOrderByCreationDateAsc();
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There are no users in the database!");
+        }
+        return convertUsersToDtoList(users);
     }
 
     @Override
     public List<UserDto> loadLast10AddedUsers() {
-        return convertUsersToDtoList(userRepository.findFirst10ByOrderByCreationDateDesc());
+        List<User> users = userRepository.findFirst10ByOrderByCreationDateDesc();
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There are no users in the database!");
+        }
+        return convertUsersToDtoList(users);
     }
 
     @Override
     public List<UserDto> loadEnabledUsers() {
-        return convertUsersToDtoList(userRepository.findByEnabled(true));
+        List<User> users = userRepository.findByEnabled(true);
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There are no enabled users!");
+        }
+        return convertUsersToDtoList(users);
     }
 
     @Override
     public List<UserDto> loadAdmins() {
         Role adminRole = roleRepository.findByName(RoleName.ADMIN);
+        List<User> users = userRepository.findByRoles(adminRole);
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("There are no admins in the database!");
+        }
         return convertUsersToDtoList(userRepository.findByRoles(adminRole));
     }
 
