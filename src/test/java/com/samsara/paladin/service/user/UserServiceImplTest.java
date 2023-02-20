@@ -43,6 +43,7 @@ import com.samsara.paladin.exceptions.passwordValidation.PasswordArgumentMissing
 import com.samsara.paladin.exceptions.passwordValidation.ResetPasswordFailedException;
 import com.samsara.paladin.exceptions.user.EmailExistsException;
 import com.samsara.paladin.exceptions.user.EmailNotFoundException;
+import com.samsara.paladin.exceptions.user.UserNotFoundException;
 import com.samsara.paladin.exceptions.user.UsernameExistsException;
 import com.samsara.paladin.exceptions.user.UsernameNotFoundException;
 import com.samsara.paladin.model.Role;
@@ -265,6 +266,34 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Update user test when email found then throw")
+    void updateUserTestWhenEmailFoundThenThrow() {
+
+        User user = User.builder()
+                .id(1L)
+                .username("test")
+                .build();
+
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .username("test")
+                .email("test@email.com")
+                .build();
+
+        when(userRepository.findByUsername(anyString()))
+                .thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail(anyString()))
+                .thenReturn(true);
+
+        assertThrows(EmailExistsException.class, () -> {
+            userService.updateUser(userDto);
+            verify(userRepository).findByUsername(userDto.getUsername());
+            verify(userRepository).existsByEmail(userDto.getEmail());
+            verify(userRepository, never()).save(user);
+        });
+    }
+
+    @Test
     @DisplayName("Update user test when user dto password is not null then throw")
     void updateUserTestWhenUserDtoPasswordIsNotNullThenThrow() {
 
@@ -437,18 +466,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("Load all users test when no users are stored")
-    void loadAllUsersTestWhenNoUsersAreStored() {
+    @DisplayName("Load all users test when no users are stored then throw")
+    void loadAllUsersTestWhenNoUsersAreStoredThenThrow() {
 
         when(userRepository.findAll())
                 .thenReturn(new ArrayList<>());
 
-        List<UserDto> responseList = userService.loadAllUsers();
-
-        verify(userRepository).findAll();
-        verify(modelMapper, never()).map(any(), any());
-
-        assertEquals(0, responseList.size());
+        assertThrows(UserNotFoundException.class, () -> {
+            List<UserDto> responseList = userService.loadAllUsers();
+            verify(userRepository).findAll();
+            verify(modelMapper, never()).map(any(), any());
+            assertEquals(0, responseList.size());
+        });
     }
 
     @Test
@@ -575,18 +604,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("Load users by first name test when no users are stored")
-    void loadUsersByFirstNameTestWhenNoUsersAreStored() {
+    @DisplayName("Load users by first name test when no users are stored then throw")
+    void loadUsersByFirstNameTestWhenNoUsersAreStoredThenThrow() {
 
         when(userRepository.findByFirstName(anyString()))
                 .thenReturn(new ArrayList<>());
 
-        List<UserDto> responseList = userService.loadUsersByFirstName(anyString());
-
-        verify(userRepository).findByFirstName(anyString());
-        verify(modelMapper, never()).map(any(), any());
-
-        assertEquals(0, responseList.size());
+        assertThrows(UserNotFoundException.class, () -> {
+            List<UserDto> responseList = userService.loadUsersByFirstName(anyString());
+            verify(userRepository).findByFirstName(anyString());
+            verify(modelMapper, never()).map(any(), any());
+            assertEquals(0, responseList.size());
+        });
     }
 
     @Test
@@ -631,18 +660,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("Load first added users test when no users found")
-    void loadFirstAddedUsersTestWhenNoUsersFound() {
+    @DisplayName("Load first added users test when no users found then throw")
+    void loadFirstAddedUsersTestWhenNoUsersFoundThenThrow() {
 
         when(userRepository.findFirst10ByOrderByCreationDateAsc())
                 .thenReturn(new ArrayList<>());
 
-        List<UserDto> responseList = userService.loadFirst10AddedUsers();
-
-        verify(userRepository).findFirst10ByOrderByCreationDateAsc();
-        verify(modelMapper, never()).map(any(), any());
-
-        assertEquals(0, responseList.size());
+        assertThrows(UserNotFoundException.class, () -> {
+            List<UserDto> responseList = userService.loadFirst10AddedUsers();
+            verify(userRepository).findFirst10ByOrderByCreationDateAsc();
+            verify(modelMapper, never()).map(any(), any());
+            assertEquals(0, responseList.size());
+        });
     }
 
     @Test
@@ -688,18 +717,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("Load last added users test when no users found")
-    void loadLastAddedUsersTestWhenNoUsersFound() {
+    @DisplayName("Load last added users test when no users found then throw")
+    void loadLastAddedUsersTestWhenNoUsersFoundThenThrow() {
 
         when(userRepository.findFirst10ByOrderByCreationDateDesc())
                 .thenReturn(new ArrayList<>());
 
-        List<UserDto> responseList = userService.loadLast10AddedUsers();
-
-        verify(userRepository).findFirst10ByOrderByCreationDateDesc();
-        verify(modelMapper, never()).map(any(), any());
-
-        assertEquals(0, responseList.size());
+        assertThrows(UserNotFoundException.class, () -> {
+            List<UserDto> responseList = userService.loadLast10AddedUsers();
+            verify(userRepository).findFirst10ByOrderByCreationDateDesc();
+            verify(modelMapper, never()).map(any(), any());
+            assertEquals(0, responseList.size());
+        });
     }
 
     @Test
@@ -786,6 +815,22 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Load enabled users test when no users are enabled then throw")
+    void loadEnabledUsersTestWhenNoUsersAreEnabledThenThrow() {
+
+        when(userRepository.findByEnabled(true))
+                .thenReturn(new ArrayList<>());
+
+        assertThrows(UserNotFoundException.class, (() -> {
+            List<UserDto> responseList = userService.loadEnabledUsers();
+
+            verify(userRepository).findByEnabled(true);
+            verify(modelMapper, never()).map(any(User.class), UserDto.class);
+            assertEquals(0, responseList.size());
+        }));
+    }
+
+    @Test
     @DisplayName("Load admins test")
     void loadAdminsTest() {
 
@@ -841,18 +886,42 @@ public class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("Load users by last name test when no users are stored")
-    void loadUsersByLastNameTestWhenNoUsersAreStored() {
+    @DisplayName("Load enabled users test when no users are granted admin then throw")
+    void loadAdminsTestWhenNoUsersAreGrantedAdminThenThrow() {
+
+        Role roleAdmin = Role.builder()
+                .id(1L)
+                .name(RoleName.ADMIN)
+                .build();
+
+        when(roleRepository.findByName(RoleName.ADMIN))
+                .thenReturn(roleAdmin);
+        when(userRepository.findByRoles(roleAdmin))
+                .thenReturn(new ArrayList<>());
+
+        assertThrows(UserNotFoundException.class, (() -> {
+            List<UserDto> responseList = userService.loadAdmins();
+
+            verify(roleRepository).findByName(RoleName.ADMIN);
+            verify(userRepository).findByRoles(roleAdmin);
+            verify(modelMapper, never()).map(any(User.class), UserDto.class);
+            assertEquals(0, responseList.size());
+        }));
+    }
+
+    @Test
+    @DisplayName("Load users by last name test when no users are stored then throw")
+    void loadUsersByLastNameTestWhenNoUsersAreStoredThenThrow() {
 
         when(userRepository.findByLastName(anyString()))
                 .thenReturn(new ArrayList<>());
 
-        List<UserDto> responseList = userService.loadUsersByLastName(anyString());
-
-        verify(userRepository).findByLastName(anyString());
-        verify(modelMapper, never()).map(any(), any());
-
-        assertEquals(0, responseList.size());
+        assertThrows(UserNotFoundException.class, () -> {
+            List<UserDto> responseList = userService.loadUsersByLastName(anyString());
+            verify(userRepository).findByLastName(anyString());
+            verify(modelMapper, never()).map(any(), any());
+            assertEquals(0, responseList.size());
+        });
     }
 
     @Test

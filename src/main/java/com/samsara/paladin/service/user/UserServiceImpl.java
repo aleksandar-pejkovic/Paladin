@@ -204,7 +204,7 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty()) {
             throw new UserNotFoundException("There are no admins in the database!");
         }
-        return convertUsersToDtoList(userRepository.findByRoles(adminRole));
+        return convertUsersToDtoList(users);
     }
 
     private void encryptUserPassword(User user) {
