@@ -33,7 +33,7 @@ public interface UserRepository extends ListCrudRepository<User, Long> {
             "SELECT u.email "
                     + "FROM User u "
                     + "JOIN u.roles r "
-                    + "WHERE r.id=1 "
+                    + "WHERE r.id = (SELECT r.id FROM Role r WHERE r.name = 'ADMIN') "
     )
     List<String> findAdminEmails();
 

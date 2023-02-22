@@ -1,7 +1,6 @@
 package com.samsara.paladin.service.email;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.samsara.paladin.dto.EmailDetails;
 import com.samsara.paladin.model.Event;
-import com.samsara.paladin.model.User;
+import com.samsara.paladin.repository.RoleRepository;
 import com.samsara.paladin.repository.UserRepository;
 
 @Service
@@ -30,6 +29,9 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Async
     @Override
@@ -38,11 +40,7 @@ public class EmailServiceImpl implements EmailService {
         List<String> adminEmailsList = userRepository.findAdminEmails();
         String[] adminEmails = adminEmailsList.toArray(new String[0]);
 
-        boolean isAdmin = false;
-        Optional<User> optionalUser = userRepository.findByUsername(event.getUsername());
-        if (optionalUser.isPresent()) {
-            isAdmin = optionalUser.get().isAdmin();
-        }
+        boolean isAdmin = roleRepository.hasAdminRole(event.getUsername());
 
         EmailDetails emailDetails = new EmailDetails(event, isAdmin);
 

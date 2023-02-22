@@ -1,7 +1,5 @@
 package com.samsara.paladin.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,11 +12,13 @@ import com.samsara.paladin.model.Role;
 public interface RoleRepository extends ListCrudRepository<Role, Long> {
 
     @Query(
-            "SELECT u.roles "
+            "SELECT COUNT(u) > 0 "
                     + "FROM User u "
+                    + "JOIN u.roles r "
                     + "WHERE u.username = :username "
+                    + "AND r.name = 'ADMIN' "
     )
-    List<Role> getRolesByUser(@Param("username") String username);
+    boolean hasAdminRole(@Param("username") String username);
 
     Role findByName(RoleName name);
 }

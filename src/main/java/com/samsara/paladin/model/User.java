@@ -2,11 +2,8 @@ package com.samsara.paladin.model;
 
 import java.util.Date;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.springframework.format.annotation.DateTimeFormat;
-
-import com.samsara.paladin.enums.RoleName;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -72,10 +69,4 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     private Avatar avatar;
-
-    public boolean isAdmin() {
-        return roles.stream()
-                .map(Role::getName)
-                .anyMatch(Predicate.isEqual(RoleName.ADMIN));
-    }
 }

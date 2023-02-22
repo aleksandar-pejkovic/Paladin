@@ -77,10 +77,10 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new EmailExistsException("Account with email '" + userDto.getEmail() + "' already exist!");
         }
-        User currentUser = optionalUser.get();
         if (userDto.getPassword() != null) {
             throw new IllegalPasswordArgumentException("Please use 'password reset' option for password update!");
         }
+        User currentUser = optionalUser.get();
         modelMapper.map(userDto, currentUser);
         User updatedUser = userRepository.save(currentUser);
         publishUserEvent(updatedUser.getUsername(), EventAction.EDIT);
@@ -89,7 +89,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean resetUserPassword(ResetPasswordDetails resetPasswordDetails) {
-
         userRepository.findByUsername(resetPasswordDetails.getUsername())
                 .filter(user -> user.getSecretAnswer().equals(resetPasswordDetails.getSecretAnswer()))
                 .map(user -> encryptUserPassword(user, resetPasswordDetails.getNewPassword()))
