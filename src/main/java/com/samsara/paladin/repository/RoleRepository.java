@@ -12,11 +12,13 @@ import com.samsara.paladin.model.Role;
 public interface RoleRepository extends ListCrudRepository<Role, Long> {
 
     @Query(
-            "SELECT COUNT(u) > 0 "
+            "SELECT CASE WHEN EXISTS ( "
+                    + "SELECT u "
                     + "FROM User u "
                     + "JOIN u.roles r "
                     + "WHERE u.username = :username "
                     + "AND r.name = 'ADMIN' "
+                    + ") THEN true ELSE false END "
     )
     boolean hasAdminRole(@Param("username") String username);
 
