@@ -66,8 +66,7 @@ public class AvatarController {
         Avatar avatar = optionalAvatar.get();
 
         headers.add("image-name", avatar.getImageName());
-        headers.add("image-type", avatar.getImageType());
-        if ("png".equals(avatar.getImageType())) {
+        if ("image/png".equals(avatar.getImageType())) {
             headers.setContentType(MediaType.IMAGE_PNG);
         }
         return new ResponseEntity<>(avatar.getImage(), headers, HttpStatus.OK);
