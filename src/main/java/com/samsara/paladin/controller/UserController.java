@@ -1,6 +1,7 @@
 package com.samsara.paladin.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.samsara.paladin.configuration.validation.user.name.NameConstraint;
@@ -33,6 +35,11 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+
+    @GetMapping("/search")
+    public Set<UserDto> searchUsers(@RequestParam String searchTerm) {
+        return userService.searchUsers(searchTerm);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUserAccount(@Valid @RequestBody UserDto userDto) {

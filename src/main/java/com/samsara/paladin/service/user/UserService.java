@@ -1,11 +1,14 @@
 package com.samsara.paladin.service.user;
 
 import java.util.List;
+import java.util.Set;
 
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
 
 public interface UserService {
+
+    Set<UserDto> searchUsers(String searchTerm);
 
     UserDto registerUser(UserDto userDto);
 

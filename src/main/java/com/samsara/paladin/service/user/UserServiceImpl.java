@@ -2,14 +2,17 @@ package com.samsara.paladin.service.user;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.samsara.paladin.dto.ResetPasswordDetails;
 import com.samsara.paladin.dto.UserDto;
@@ -47,6 +50,18 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public Set<UserDto> searchUsers(String searchTerm) {
+        Set<User> results = new HashSet<>();
+        results.addAll(userRepository.searchByUsername(searchTerm));
+        results.addAll(userRepository.searchByName(searchTerm));
+        results.addAll(userRepository.searchByEmail(searchTerm));
+        return results
+                .stream()
+                .map(this::convertUserToDto)
+                .collect(Collectors.toSet());
+    }
 
     public UserDto registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {

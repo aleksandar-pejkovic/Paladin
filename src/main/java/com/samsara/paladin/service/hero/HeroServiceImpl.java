@@ -39,6 +39,13 @@ public class HeroServiceImpl implements HeroService {
     private UserRepository userRepository;
 
     @Override
+    public List<HeroDto> searchHeroes(String searchTerm) {
+        return heroRepository.searchByName(searchTerm)
+                .stream().map(this::convertHeroToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public HeroDto createHero(HeroDto heroDto) {
         if (heroRepository.existsByName(heroDto.getName())) {
             throw new HeroExistsException("Hero named '" + heroDto.getName() + "' already exist!");
