@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> loadFirst10AddedUsers() {
         List<User> users = userRepository.findFirst10ByOrderByCreationDateAsc();
         if (users.isEmpty()) {
-            throw new UserNotFoundException("There are no users in the database!");
+            throw new UserNotFoundException("There are no users stored in the database!");
         }
         return convertUsersToDtoList(users);
     }
@@ -237,11 +237,7 @@ public class UserServiceImpl implements UserService {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        if (user.getHeroes() != null) {
-            userDto.setHeroCount(user.getHeroes().size());
-        } else {
-            userDto.setHeroCount(0);
-        }
+        userDto.setHeroCount(user.getHeroes() != null ? user.getHeroes().size() : 0);
         return userDto;
     }
 
