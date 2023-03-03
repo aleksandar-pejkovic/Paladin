@@ -30,12 +30,10 @@ public interface UserRepository extends ListCrudRepository<User, Long> {
 
     List<User> findByRoles(Role role);
 
-    @Query(
-            "SELECT u.email "
-                    + "FROM User u "
-                    + "JOIN u.roles r "
-                    + "ON r.name = 'ADMIN' "
-    )
+    @Query("SELECT u FROM User u JOIN u.roles r ON r.name = 'ADMIN'")
+    List<User> findAdmins();
+
+    @Query("SELECT u.email FROM User u JOIN u.roles r ON r.name = 'ADMIN'")
     List<String> findAdminEmails();
 
     @Query("SELECT u FROM User u WHERE u.username LIKE %:searchTerm%")

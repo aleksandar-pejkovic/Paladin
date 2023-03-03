@@ -213,8 +213,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> loadAdmins() {
-        Role adminRole = roleRepository.findByName(RoleName.ADMIN);
-        List<User> users = userRepository.findByRoles(adminRole);
+        List<User> users = userRepository.findAdmins();
         if (users.isEmpty()) {
             throw new UserNotFoundException("There are no admins in the database!");
         }
