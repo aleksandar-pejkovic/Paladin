@@ -867,9 +867,7 @@ public class UserServiceImplTest {
                 .build();
         List<User> usersInDb = new ArrayList<>(Arrays.asList(user1, user2));
 
-        when(roleRepository.findByName(RoleName.ADMIN))
-                .thenReturn(roleAdmin);
-        when(userRepository.findByRoles(roleAdmin))
+        when(userRepository.findAdmins())
                 .thenReturn(usersInDb);
         when(modelMapper.map(user1, UserDto.class))
                 .thenReturn(userDto1);
@@ -878,7 +876,7 @@ public class UserServiceImplTest {
 
         List<UserDto> responseList = userService.loadAdmins();
 
-        verify(userRepository).findByRoles(roleAdmin);
+        verify(userRepository).findAdmins();
         verify(modelMapper).map(user1, UserDto.class);
         verify(modelMapper).map(user2, UserDto.class);
 
@@ -889,21 +887,13 @@ public class UserServiceImplTest {
     @DisplayName("Load enabled users test when no users are granted admin then throw")
     void loadAdminsTestWhenNoUsersAreGrantedAdminThenThrow() {
 
-        Role roleAdmin = Role.builder()
-                .id(1L)
-                .name(RoleName.ADMIN)
-                .build();
-
-        when(roleRepository.findByName(RoleName.ADMIN))
-                .thenReturn(roleAdmin);
-        when(userRepository.findByRoles(roleAdmin))
+        when(userRepository.findAdmins())
                 .thenReturn(new ArrayList<>());
 
         assertThrows(UserNotFoundException.class, (() -> {
             List<UserDto> responseList = userService.loadAdmins();
 
-            verify(roleRepository).findByName(RoleName.ADMIN);
-            verify(userRepository).findByRoles(roleAdmin);
+            verify(userRepository).findAdmins();
             verify(modelMapper, never()).map(any(User.class), UserDto.class);
             assertEquals(0, responseList.size());
         }));
