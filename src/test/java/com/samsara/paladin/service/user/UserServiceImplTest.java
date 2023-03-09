@@ -97,6 +97,7 @@ public class UserServiceImplTest {
                 .password("testCryptPassword")
                 .enabled(true)
                 .creationDate(new Date())
+                .heroes(new HashSet<>())
                 .build();
 
         Role role = Role.builder()
@@ -222,6 +223,7 @@ public class UserServiceImplTest {
                 .id(1L)
                 .username("test")
                 .email("test@email.com")
+                .heroes(new HashSet<>())
                 .build();
 
         when(userRepository.findByUsername(userDto.getUsername()))

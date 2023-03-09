@@ -1,5 +1,6 @@
 package com.samsara.paladin.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.samsara.paladin.enums.PermissionName;
@@ -35,5 +36,5 @@ public class Permission {
     private PermissionName name;
 
     @ManyToMany(mappedBy = "permissions")
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 }

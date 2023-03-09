@@ -251,7 +251,7 @@ public class UserServiceImpl implements UserService {
 
     private UserDto convertUserToDto(User user) {
         UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setHeroCount(user.getHeroes() != null ? user.getHeroes().size() : 0);
+        userDto.setHeroCount(user.getHeroes().size());
         return userDto;
     }
 

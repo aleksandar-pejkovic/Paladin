@@ -1,5 +1,6 @@
 package com.samsara.paladin.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.samsara.paladin.enums.RoleName;
@@ -37,7 +38,7 @@ public class Role {
     private RoleName name;
 
     @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
@@ -46,5 +47,5 @@ public class Role {
                     name = "role_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
                     name = "permission_id", referencedColumnName = "id"))
-    private Set<Permission> permissions;
+    private Set<Permission> permissions = new HashSet<>();
 }

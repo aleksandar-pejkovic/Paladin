@@ -1,6 +1,7 @@
 package com.samsara.paladin.model;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,10 +63,10 @@ public class User {
                     name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<Hero> heroes;
+    private Set<Hero> heroes = new HashSet<>();
 
     @OneToOne(mappedBy = "user")
     private Avatar avatar;
