@@ -69,6 +69,11 @@ public class HeroServiceImpl implements HeroService {
         }
         Hero hero = optionalHero.get();
         modelMapper.map(heroDto, hero);
+        Optional<HeroType> optionalHeroType = HeroType.valueOfType(heroDto.getType());
+        if (optionalHeroType.isEmpty()) {
+            throw new HeroTypeNotFoundException("Invalid hero type!");
+        }
+        hero.setType(optionalHeroType.get());
         Hero updatedHero = heroRepository.save(hero);
         publishHeroEvent(updatedHero.getName(), EventAction.EDIT);
         return convertHeroToDto(updatedHero);
